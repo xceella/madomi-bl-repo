@@ -11,5 +11,6 @@
   {"slug":"covenscan","module":"src/pt/covenscan"},
   {"slug":"fleurblanche","module":"src/pt/fleurblanche"},
   {"slug":"portalyaoi","module":"src/pt/portalyaoi"},
-  {"slug":"xxxyaoi","module":"src/pt/xxxyaoi"}
+  {"slug":"xxxyaoi","module":"src/pt/xxxyaoi"},
+  {"slug":"bodinhoyaoi","module":"src/pt/bodinhoyaoi","custom":"custom/pt/bodinhoyaoi","iconUrl":"https://bodinhoyaoi.com/logo-256.png"}
 ]
