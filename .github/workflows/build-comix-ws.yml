@@ -26,11 +26,14 @@ jobs:
           ref: main
           path: source
 
-      - name: Patch Comix to comix.ws and bump version
+      - name: Patch Comix to comix.ws, bootstrap via browse, and bump version
         shell: bash
         run: |
           grep -RIl 'comix\.to' source/src/all/comixto | xargs -r sed -i 's/comix\.to/comix.ws/g'
-          sed -i 's/versionCode = 48/versionCode = 49/' source/src/all/comixto/build.gradle.kts
+          sed -i 's/versionCode = 48/versionCode = 50/' source/src/all/comixto/build.gradle.kts
+          sed -i 's/GET(baseUrl)/GET("$baseUrl\/browse")/' source/src/all/comixto/src/eu/kanade/tachiyomi/extension/all/comixto/ComixWebView.kt
+          echo 'Patched bootstrap:'
+          grep -n 'GET("$baseUrl/browse")' source/src/all/comixto/src/eu/kanade/tachiyomi/extension/all/comixto/ComixWebView.kt
           echo 'Patched occurrences:'
           grep -RIn 'comix.ws' source/src/all/comixto | head -30
 
@@ -60,7 +63,7 @@ jobs:
           fi
 
           mkdir -p repo/comix-ws/apk
-          OUT='repo/comix-ws/apk/tachiyomi-all.comixto-v1.4.49-ws.apk'
+          OUT='repo/comix-ws/apk/tachiyomi-all.comixto-v1.4.50-ws.apk'
           cp "$APK" "$OUT"
 
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
@@ -99,11 +102,11 @@ jobs:
           ext = idx.extensionList.extensions.add()
           ext.name = 'Comix WS'
           ext.packageName = 'eu.kanade.tachiyomi.extension.all.comixto'
-          ext.resources.apkUrl = 'https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/comix-ws/apk/tachiyomi-all.comixto-v1.4.49-ws.apk'
+          ext.resources.apkUrl = 'https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/comix-ws/apk/tachiyomi-all.comixto-v1.4.50-ws.apk'
           ext.resources.iconUrl = 'https://cdn.jsdelivr.net/gh/marbou92/MHExtensions@main/src/all/comixto/res/mipmap-xhdpi/ic_launcher.png'
           ext.extensionLib = '1.4'
-          ext.versionCode = 49
-          ext.versionName = '1.4.49'
+          ext.versionCode = 50
+          ext.versionName = '1.4.50'
           ext.contentWarning = index_pb2.CONTENT_WARNING_MIXED
           src = ext.sources.add()
           src.id = 5988840660094806119
@@ -121,5 +124,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add comix-ws
-          git commit -m 'Build Comix WS 1.4.49' || exit 0
+          git commit -m 'Build Comix WS 1.4.50' || exit 0
           git push
