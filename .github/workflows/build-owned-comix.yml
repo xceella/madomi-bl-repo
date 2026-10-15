@@ -1,0 +1,152 @@
+name: Build owned Comix
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-owned-comix
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do nosso repositório
+        uses: actions/checkout@v4
+
+      - name: Baixar o código-fonte upstream do Comix
+        run: |
+          git clone --depth 1 https://github.com/marbou92/MHExtensions.git upstream
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Preparar nossa chave de assinatura
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::O secret SIGNING_KEY ainda não foi configurado."
+            exit 1
+          fi
+          echo "$SIGNING_KEY" | base64 -d > upstream/signingkey.jks
+
+      - name: Compilar e assinar o Comix com nossa chave
+        working-directory: upstream
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :src:all:comixto:assembleRelease
+
+      - name: Calcular fingerprint da nossa assinatura
+        id: fingerprint
+        working-directory: upstream
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          FP=$(keytool -list -v \
+            -keystore signingkey.jks \
+            -storepass "$KEY_STORE_PASSWORD" \
+            -alias "$ALIAS" \
+            -keypass "$KEY_PASSWORD" \
+            | grep "SHA256:" | head -1 | awk '{print $2}')
+          if [ -z "$FP" ]; then
+            echo "::error::Não foi possível obter o fingerprint da chave."
+            exit 1
+          fi
+          echo "fingerprint=$FP" >> "$GITHUB_OUTPUT"
+
+      - name: Localizar artefatos compilados
+        id: artifacts
+        run: |
+          INFO=$(find upstream/src/all/comixto/build -name keiyoushi-source-info.json | head -1)
+          APK=$(find upstream/src/all/comixto/build/outputs/apk/release -name '*.apk' | head -1)
+          JAR=$(find upstream/src/all/comixto/build/outputs/jar/release -name '*.jar' | head -1)
+
+          if [ -z "$INFO" ] || [ -z "$APK" ] || [ -z "$JAR" ]; then
+            echo "::error::Build terminou sem encontrar INFO/APK/JAR."
+            exit 1
+          fi
+
+          VERSION=$(jq -r '.versionName' "$INFO")
+          TAG="owned-comix-v${VERSION}"
+
+          echo "info=$INFO" >> "$GITHUB_OUTPUT"
+          echo "apk=$APK" >> "$GITHUB_OUTPUT"
+          echo "jar=$JAR" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "apk_name=$(basename "$APK")" >> "$GITHUB_OUTPUT"
+          echo "jar_name=$(basename "$JAR")" >> "$GITHUB_OUTPUT"
+
+      - name: Publicar APK e JAR em GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.artifacts.outputs.tag }}
+          APK: ${{ steps.artifacts.outputs.apk }}
+          JAR: ${{ steps.artifacts.outputs.jar }}
+          VERSION: ${{ steps.artifacts.outputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$JAR" --clobber
+          else
+            gh release create "$TAG" "$APK" "$JAR" \
+              --title "Comix $VERSION — Xceella BL" \
+              --notes "Build do Comix compilada e assinada pela infraestrutura própria do Xceella BL Extensions. Código upstream: marbou92/MHExtensions (Apache-2.0)."
+          fi
+
+      - name: Gerar index.pb próprio
+        env:
+          INFO: ${{ steps.artifacts.outputs.info }}
+          TAG: ${{ steps.artifacts.outputs.tag }}
+          APK_NAME: ${{ steps.artifacts.outputs.apk_name }}
+          JAR_NAME: ${{ steps.artifacts.outputs.jar_name }}
+          FINGERPRINT: ${{ steps.fingerprint.outputs.fingerprint }}
+        run: |
+          python -m pip install --disable-pip-version-check protobuf grpcio-tools
+          cd tools
+          python -m grpc_tools.protoc --proto_path=. --python_out=. index.proto
+          cd ..
+
+          APK_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${APK_NAME}"
+          JAR_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${JAR_NAME}"
+          ICON_URL="https://raw.githubusercontent.com/marbou92/MHExtensions/main/src/all/comixto/res/mipmap-xhdpi/ic_launcher.png"
+
+          python tools/update_owned_index.py \
+            --info "$INFO" \
+            --apk-url "$APK_URL" \
+            --jar-url "$JAR_URL" \
+            --icon-url "$ICON_URL" \
+            --fingerprint "$FINGERPRINT" \
+            --output-dir owned
+
+      - name: Salvar índice próprio no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add owned/index.pb owned/index.json owned/repo.json
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração no índice."
+            exit 0
+          fi
+          git commit -m "Atualiza extensão própria Comix"
+          git push
+
+      - name: Remover chave do runner
+        if: always()
+        run: rm -f upstream/signingkey.jks
