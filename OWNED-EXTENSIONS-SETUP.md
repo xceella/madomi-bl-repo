@@ -1,78 +1,106 @@
-# Xceella BL Extensions — configuração inicial
+# Xceella BL Repo — arquitetura de extensões próprias
 
-Este arquivo documenta a migração do repositório filtrado para extensões compiladas e assinadas por nós.
+Este arquivo documenta a infraestrutura atual do repositório próprio de extensões BL para Mihon/Madomi.
 
 ## Objetivo
 
-- manter uma única identidade de assinatura para extensões próprias;
-- poder portar extensões abertas de outros projetos compatíveis;
-- poder criar fontes novas quando não existir extensão pronta;
-- publicar APK/JAR em GitHub Releases;
-- gerar `index.pb` compatível com Mihon/Madomi.
+- usar uma única identidade de assinatura controlada por nós;
+- compilar e publicar nossos próprios APK/JAR;
+- poder reaproveitar código aberto de projetos compatíveis sem depender da assinatura deles;
+- manter um `index.pb` raiz próprio;
+- adicionar novas fontes ao catálogo com o tempo;
+- criar extensões do zero quando não existir implementação pronta.
 
-## Situação atual
+## Estado atual
 
-O índice raiz (`/index.pb`) continua funcionando com as 8 fontes filtradas do Keiyoushi.
+O catálogo raiz já foi migrado para a nossa assinatura.
 
-A infraestrutura própria está sendo criada separadamente em `/owned/index.pb` para não quebrar o que já funciona. Quando todas as fontes importantes forem migradas para a nossa assinatura, o índice próprio poderá substituir o índice raiz.
+Índice principal:
 
-## Primeira extensão própria
+`https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/index.pb`
 
-Comix (`https://comix.to`) será a primeira extensão de teste.
+As 13 extensões atuais são compiladas e assinadas pela nossa infraestrutura:
 
-O workflow manual está em:
+### EN
+1. YaoiScan
+2. Yaoihub
+3. Mangago
+4. Orchisasia
+5. MangaK
+6. MangaDex
+7. MangaPark.tv (unoriginal)
+8. ManhwaZone
 
-`.github/workflows/build-owned-comix.yml`
+### PT-BR
+9. BR Yaoi
+10. Coven Scan
+11. Fleur Blanche
+12. Portal Yaoi
+13. XXX Yaoi
 
-Ele:
-1. baixa o código aberto do Comix;
-2. compila a extensão;
-3. assina APK/JAR com a nossa chave;
-4. publica os arquivos em GitHub Releases;
-5. gera `/owned/index.pb` com a nossa assinatura;
-6. salva o índice automaticamente no repositório.
+A fonte oficial do catálogo está em `catalog/sources.json`.
 
-## Segredos necessários no GitHub
+## Workflow principal
 
-Em **Settings → Secrets and variables → Actions → Repository secrets**, criar exatamente estes quatro secrets:
+`.github/workflows/build-xbl-catalog.yml`
+
+Fluxo:
+1. clona `keiyoushi/extensions-source`;
+2. confere se todos os módulos declarados existem;
+3. prepara a nossa keystore;
+4. compila os 13 módulos com a nossa assinatura;
+5. publica APK/JAR em Releases deste repositório;
+6. monta um catálogo temporário;
+7. valida que as 13 extensões estão presentes;
+8. só então promove `index.pb`, `index.json` e `repo.json` para a raiz.
+
+Se alguma etapa falhar, o índice raiz anterior não é substituído.
+
+## Segredos no GitHub
+
+Os builds usam Repository Secrets:
 
 - `SIGNING_KEY`
 - `KEY_STORE_PASSWORD`
-- `ALIAS`
 - `KEY_PASSWORD`
 
-Nunca adicionar esses valores em commits, README, Issues ou arquivos públicos.
+O alias é detectado automaticamente a partir da keystore. O secret `ALIAS` pode permanecer configurado por compatibilidade com workflows antigos, mas o workflow raiz não depende dele.
 
-## Chave pública/fingerprint
+Nunca salvar a keystore, senhas ou conteúdo dos secrets em arquivos públicos, commits, Issues ou README.
 
-Fingerprint SHA-256 da chave criada para este projeto:
+## Chave pública / fingerprint
+
+SHA-256:
 
 `7A:41:E1:29:8A:15:1D:48:F4:9A:A7:58:08:7E:9B:A3:F8:5E:C0:BF:57:EC:8B:2B:93:C7:54:87:81:D3:18:50`
 
-O índice grava a forma normalizada sem `:` automaticamente.
+## Migração de instalações antigas
 
-## Depois dos secrets
+Os package names upstream são preservados. Isso mantém a identidade lógica das fontes, mas Android não aceita atualizar um APK assinado por outra chave.
 
-Executar manualmente em **Actions → Build owned Comix → Run workflow**.
+Ao trocar uma extensão oficial/terceira pela versão XBL:
+1. desinstalar a extensão antiga uma vez;
+2. instalar a versão do Xceella BL Repo;
+3. a partir daí, futuras atualizações XBL podem ser instaladas normalmente porque continuarão usando a mesma chave.
 
-Se o build passar, o novo índice será:
+## Adicionando fontes existentes
 
-`https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/owned/index.pb`
+Para uma extensão já existente no Keiyoushi, normalmente basta adicionar seu módulo a `catalog/sources.json`. O workflow recompila o catálogo com nossa assinatura.
 
-Esse índice terá somente extensões assinadas por nossa própria chave.
+Antes de adicionar, conferir:
+- licença;
+- compatibilidade atual;
+- domínio/site funcional;
+- valor real para nosso catálogo BL.
 
-## Migração futura
+## Criando extensões próprias
 
-Depois de validar o Comix:
+Quando não existir módulo upstream, criaremos a implementação seguindo o padrão atual do Keiyoushi/Mihon e depois a incorporaremos ao mesmo catálogo e à mesma assinatura.
 
-1. migrar YaoiScan;
-2. migrar Yaoihub;
-3. migrar Mangago;
-4. migrar Orchisasia;
-5. migrar MangaK;
-6. migrar MangaDex;
-7. migrar MangaPark.tv;
-8. migrar ManhwaZone;
-9. desenvolver fontes novas para DesireScans, SpringToons e QToon quando viável.
+Primeiro candidato: **Bodinho Yaoi** (`https://bodinhoyaoi.com/`).
 
-Durante a migração, o índice antigo continua intacto como fallback.
+Outras fontes em observação: DesireScans, SpringToons e QToon.
+
+## Legado
+
+`owned/`, `comix/` e `comix-ws/` são registros dos testes que levaram à infraestrutura atual. Não são o índice raiz oficial.
