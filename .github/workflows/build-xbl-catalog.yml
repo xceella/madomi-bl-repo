@@ -1,0 +1,212 @@
+name: Build XBL root catalog
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-xbl-root-catalog
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout do nosso repositório
+        uses: actions/checkout@v4
+
+      - name: Baixar o código-fonte do Keiyoushi
+        run: |
+          git clone --depth 1 https://github.com/keiyoushi/extensions-source.git upstream
+
+      - name: Configurar Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Preparar nossa chave de assinatura
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::O secret SIGNING_KEY não está configurado."
+            exit 1
+          fi
+          printf '%s' "$SIGNING_KEY" | base64 -d > upstream/signingkey.jks
+
+      - name: Detectar alias da nossa chave
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        run: |
+          if [ -z "$KEY_STORE_PASSWORD" ]; then
+            echo "::error::O secret KEY_STORE_PASSWORD não está configurado."
+            exit 1
+          fi
+
+          DETECTED_ALIAS=$(keytool -list -v \
+            -keystore upstream/signingkey.jks \
+            -storepass "$KEY_STORE_PASSWORD" \
+            | sed -n 's/^Alias name: //p' \
+            | head -1)
+
+          if [ -z "$DETECTED_ALIAS" ]; then
+            echo "::error::Não foi possível detectar o alias da keystore."
+            exit 1
+          fi
+
+          echo "ALIAS=$DETECTED_ALIAS" >> "$GITHUB_ENV"
+          echo "Alias detectado com sucesso."
+
+      - name: Validar catálogo configurado
+        run: |
+          COUNT=$(jq 'length' catalog/sources.json)
+          if [ "$COUNT" -ne 13 ]; then
+            echo "::error::O catálogo deveria conter 13 extensões, mas contém $COUNT."
+            exit 1
+          fi
+
+          while read -r module; do
+            if [ ! -f "upstream/${module}/build.gradle.kts" ]; then
+              echo "::error::Módulo upstream não encontrado: ${module}"
+              exit 1
+            fi
+          done < <(jq -r '.[].module' catalog/sources.json)
+
+      - name: Compilar as 13 extensões com nossa assinatura
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::O secret KEY_PASSWORD não está configurado."
+            exit 1
+          fi
+
+          TASKS=()
+          while read -r module; do
+            gradle_module=":${module//\//:}:assembleRelease"
+            TASKS+=("$gradle_module")
+          done < <(jq -r '.[].module' catalog/sources.json)
+
+          cd upstream
+          chmod +x ./gradlew
+          ./gradlew "${TASKS[@]}"
+
+      - name: Calcular fingerprint da nossa assinatura
+        id: fingerprint
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          FP=$(keytool -list -v \
+            -keystore upstream/signingkey.jks \
+            -storepass "$KEY_STORE_PASSWORD" \
+            -alias "$ALIAS" \
+            -keypass "$KEY_PASSWORD" \
+            | grep "SHA256:" | head -1 | awk '{print $2}')
+
+          if [ -z "$FP" ]; then
+            echo "::error::Não foi possível obter o fingerprint da assinatura."
+            exit 1
+          fi
+
+          echo "fingerprint=$FP" >> "$GITHUB_OUTPUT"
+
+      - name: Preparar gerador do index.pb
+        run: |
+          python -m pip install --disable-pip-version-check protobuf grpcio-tools
+          cd tools
+          python -m grpc_tools.protoc --proto_path=. --python_out=. index.proto
+          cd ..
+          rm -rf generated-root
+          mkdir -p generated-root
+
+      - name: Publicar nossas builds e montar o catálogo raiz
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FINGERPRINT: ${{ steps.fingerprint.outputs.fingerprint }}
+        run: |
+          while IFS= read -r row; do
+            SLUG=$(echo "$row" | jq -r '.slug')
+            MODULE=$(echo "$row" | jq -r '.module')
+
+            INFO="upstream/${MODULE}/build/keiyoushi-source-info.json"
+            APK=$(find "upstream/${MODULE}/build/outputs/apk/release" -name '*.apk' | head -1)
+            JAR=$(find "upstream/${MODULE}/build/outputs/jar/release" -name '*.jar' | head -1)
+
+            if [ ! -f "$INFO" ] || [ -z "$APK" ] || [ -z "$JAR" ]; then
+              echo "::error::Artefatos ausentes para ${SLUG}."
+              exit 1
+            fi
+
+            VERSION=$(jq -r '.versionName' "$INFO")
+            NAME=$(jq -r '.name' "$INFO")
+            TAG="xbl-${SLUG}-v${VERSION}"
+            APK_NAME=$(basename "$APK")
+            JAR_NAME=$(basename "$JAR")
+
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              gh release upload "$TAG" "$APK" "$JAR" --clobber
+            else
+              gh release create "$TAG" "$APK" "$JAR" \
+                --title "${NAME} ${VERSION} — Xceella BL" \
+                --notes "Build compilada e assinada pelo Xceella BL Repo. Código-base: keiyoushi/extensions-source (Apache-2.0)."
+            fi
+
+            APK_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${APK_NAME}"
+            JAR_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${JAR_NAME}"
+            ICON_URL="https://raw.githubusercontent.com/keiyoushi/extensions-source/main/${MODULE}/res/mipmap-xhdpi/ic_launcher.png"
+
+            python tools/update_owned_index.py \
+              --info "$INFO" \
+              --apk-url "$APK_URL" \
+              --jar-url "$JAR_URL" \
+              --icon-url "$ICON_URL" \
+              --fingerprint "$FINGERPRINT" \
+              --output-dir generated-root \
+              --index-url "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/index.pb" \
+              --name "Xceella BL Repo" \
+              --badge-label "XBL"
+          done < <(jq -c '.[]' catalog/sources.json)
+
+      - name: Validar catálogo final
+        run: |
+          COUNT=$(jq '.extensionList.extensions | length' generated-root/index.json)
+          if [ "$COUNT" -ne 13 ]; then
+            echo "::error::O catálogo final deveria conter 13 extensões, mas contém $COUNT."
+            exit 1
+          fi
+
+          echo "Catálogo final contém 13 extensões assinadas pela nossa chave."
+
+      - name: Promover catálogo próprio para a raiz
+        run: |
+          cp generated-root/index.pb index.pb
+          cp generated-root/index.json index.json
+          cp generated-root/repo.json repo.json
+
+      - name: Salvar catálogo raiz no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.pb index.json repo.json
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração no catálogo raiz."
+            exit 0
+          fi
+
+          git commit -m "Build XBL root catalog with owned signatures"
+          git push
+
+      - name: Remover nossa chave do runner
+        if: always()
+        run: rm -f upstream/signingkey.jks
