@@ -1,0 +1,118 @@
+name: Build Comix WS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-comix-ws.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout personal repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout MarBou extensions
+        uses: actions/checkout@v4
+        with:
+          repository: marbou92/MHExtensions
+          ref: main
+          path: source
+
+      - name: Patch Comix to comix.ws and bump version
+        shell: bash
+        run: |
+          grep -RIl 'comix\.to' source/src/all/comixto | xargs -r sed -i 's/comix\.to/comix.ws/g'
+          sed -i 's/versionCode = 48/versionCode = 49/' source/src/all/comixto/build.gradle.kts
+          echo 'Patched occurrences:'
+          grep -RIn 'comix.ws' source/src/all/comixto | head -30
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Comix WS debug APK
+        working-directory: source
+        run: |
+          chmod +x gradlew
+          ./gradlew :src:all:comixto:assembleDebug
+
+      - name: Publish APK and generate index.pb
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=$(find source/src/all/comixto/build/outputs/apk/debug -name '*.apk' | head -1)
+          if [ -z "$APK" ]; then
+            echo 'APK not found'
+            exit 1
+          fi
+
+          mkdir -p repo/comix-ws/apk
+          OUT='repo/comix-ws/apk/tachiyomi-all.comixto-v1.4.49-ws.apk'
+          cp "$APK" "$OUT"
+
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          FINGERPRINT=$($APKSIGNER verify --print-certs "$OUT" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1 | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          if [ -z "$FINGERPRINT" ]; then
+            echo 'Could not determine signing fingerprint'
+            exit 1
+          fi
+          echo "Signing fingerprint: $FINGERPRINT"
+
+          python -m pip install --quiet grpcio-tools protobuf
+          python -m grpc_tools.protoc \
+            --proto_path=source/.github/scripts \
+            --python_out=/tmp \
+            source/.github/scripts/index.proto
+
+          export COMIX_WS_FINGERPRINT="$FINGERPRINT"
+          python <<'PY'
+          import gzip, os, sys
+          sys.path.insert(0, '/tmp')
+          import index_pb2
+
+          idx = index_pb2.Index()
+          idx.name = 'Comix WS'
+          idx.badgeLabel = 'WS'
+          idx.signingKey = os.environ['COMIX_WS_FINGERPRINT']
+          idx.contact.website = 'https://github.com/xceella/madomi-bl-repo'
+
+          ext = idx.extensionList.extensions.add()
+          ext.name = 'Comix WS'
+          ext.packageName = 'eu.kanade.tachiyomi.extension.all.comixto'
+          ext.resources.apkUrl = 'https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/comix-ws/apk/tachiyomi-all.comixto-v1.4.49-ws.apk'
+          ext.resources.iconUrl = 'https://cdn.jsdelivr.net/gh/marbou92/MHExtensions@main/src/all/comixto/res/mipmap-xhdpi/ic_launcher.png'
+          ext.extensionLib = '1.4'
+          ext.versionCode = 49
+          ext.versionName = '1.4.49'
+          ext.contentWarning = index_pb2.CONTENT_WARNING_MIXED
+          src = ext.sources.add()
+          src.id = 5988840660094806119
+          src.name = 'Comix WS'
+          src.language = 'all'
+          src.homeUrl = 'https://comix.ws'
+          src.mirrorUrls.append('https://comix.to')
+
+          data = idx.SerializeToString()
+          with gzip.open('repo/comix-ws/index.pb', 'wb', mtime=0) as f:
+              f.write(data)
+          PY
+
+          cd repo
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add comix-ws
+          git commit -m 'Build Comix WS 1.4.49' || exit 0
+          git push
