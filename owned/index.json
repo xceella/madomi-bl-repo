@@ -1,0 +1,33 @@
+{
+  "name": "Xceella BL Extensions",
+  "badgeLabel": "XBL",
+  "signingKey": "7a41e1298a151d48f49aa758087e9ba3f85ec0bf57ec8b2b93c7548781d31850",
+  "contact": {
+    "website": "https://github.com/xceella/madomi-bl-repo"
+  },
+  "extensionList": {
+    "extensions": [
+      {
+        "name": "Comix",
+        "packageName": "eu.kanade.tachiyomi.extension.all.comixto",
+        "resources": {
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/owned-comix-v1.4.48/tachiyomi-all.comixto-v1.4.48-release.apk",
+          "iconUrl": "https://raw.githubusercontent.com/marbou92/MHExtensions/main/src/all/comixto/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/owned-comix-v1.4.48/tachiyomi-all.comixto-v1.4.48.jar"
+        },
+        "extensionLib": "1.4",
+        "versionCode": "48",
+        "versionName": "1.4.48",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "5988840660094806119",
+            "name": "Comix",
+            "language": "all",
+            "homeUrl": "https://comix.to"
+          }
+        ]
+      }
+    ]
+  }
+}
