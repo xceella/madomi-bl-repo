@@ -2,6 +2,14 @@ name: Build XBL root catalog
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'catalog/sources.json'
+      - 'tools/update_owned_index.py'
+      - 'tools/index.proto'
+      - '.github/workflows/build-xbl-catalog.yml'
 
 permissions:
   contents: write
