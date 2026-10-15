@@ -1,0 +1,15 @@
+[
+  {"slug":"yaoiscan","module":"src/en/yaoiscan"},
+  {"slug":"yaoihub","module":"src/en/yaoihub"},
+  {"slug":"mangago","module":"src/en/mangago"},
+  {"slug":"orchisasia","module":"src/en/orchisasia"},
+  {"slug":"mangak","module":"src/en/mangabuddy"},
+  {"slug":"mangadex","module":"src/all/mangadex"},
+  {"slug":"mangaparktv","module":"src/en/mangaparktv"},
+  {"slug":"manhwazone","module":"src/en/manhwazone"},
+  {"slug":"bryaoi","module":"src/pt/bryaoi"},
+  {"slug":"covenscan","module":"src/pt/covenscan"},
+  {"slug":"fleurblanche","module":"src/pt/fleurblanche"},
+  {"slug":"portalyaoi","module":"src/pt/portalyaoi"},
+  {"slug":"xxxyaoi","module":"src/pt/xxxyaoi"}
+]
