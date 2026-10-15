@@ -41,11 +41,28 @@ jobs:
           fi
           echo "$SIGNING_KEY" | base64 -d > upstream/signingkey.jks
 
+      - name: Detectar alias real da chave
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        run: |
+          DETECTED_ALIAS=$(keytool -list -v \
+            -keystore upstream/signingkey.jks \
+            -storepass "$KEY_STORE_PASSWORD" \
+            | sed -n 's/^Alias name: //p' \
+            | head -1)
+
+          if [ -z "$DETECTED_ALIAS" ]; then
+            echo "::error::Não foi possível detectar o alias dentro da keystore."
+            exit 1
+          fi
+
+          echo "ALIAS=$DETECTED_ALIAS" >> "$GITHUB_ENV"
+          echo "Alias da chave detectado automaticamente."
+
       - name: Compilar e assinar o Comix com nossa chave
         working-directory: upstream
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-          ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x ./gradlew
@@ -56,7 +73,6 @@ jobs:
         working-directory: upstream
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-          ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           FP=$(keytool -list -v \
