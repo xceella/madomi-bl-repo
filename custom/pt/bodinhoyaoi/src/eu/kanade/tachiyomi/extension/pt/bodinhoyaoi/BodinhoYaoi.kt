@@ -134,16 +134,22 @@ abstract class BodinhoYaoi : KeiSource() {
             if (href.isBlank()) return@mapNotNull null
 
             val slug = href.substringAfterLast("/capitulo/", "")
-            val rawName = element.text().trim()
-            val cleanedName = rawName
-                .replace(Regex("\\s*\\d+\\s*págs?\\.?$", RegexOption.IGNORE_CASE), "")
-                .trim()
-                .ifBlank { "Capítulo $slug" }
+            val chapterTitle = element.selectFirst("span.block.truncate")
+                ?.text()
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+                ?: element.selectFirst("span.text-xs.font-bold")
+                    ?.text()
+                    ?.trim()
+                    ?.takeIf { it.isNotBlank() }
+                ?: element.text()
+                    .replace(Regex("\\s*\\d+\\s*págs?\\.?$", RegexOption.IGNORE_CASE), "")
+                    .trim()
+                    .ifBlank { "Capítulo $slug" }
 
             SChapter.create().apply {
                 setUrlWithoutDomain(href)
-                name = cleanedName
-                chapter_number = slug.replace(',', '.').toFloatOrNull() ?: -1f
+                name = chapterTitle
             }
         }
 
