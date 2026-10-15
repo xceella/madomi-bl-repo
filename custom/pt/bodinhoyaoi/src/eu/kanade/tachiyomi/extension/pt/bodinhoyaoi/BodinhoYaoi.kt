@@ -86,7 +86,8 @@ abstract class BodinhoYaoi : KeiSource() {
     }
 
     private fun parseDetails(document: Document, original: SManga): SManga = original.apply {
-        title = document.selectFirst("h1")?.text()?.takeIf { it.isNotBlank() } ?: title
+        val titleElement = document.selectFirst("h1")
+        title = titleElement?.text()?.takeIf { it.isNotBlank() } ?: title
 
         thumbnail_url = document.selectFirst("meta[property='og:image']")
             ?.attr("content")
@@ -106,15 +107,27 @@ abstract class BodinhoYaoi : KeiSource() {
             .takeIf { it.isNotBlank() }
             ?: genre
 
-        val pageText = document.text()
+        val statusText = titleElement
+            ?.parent()
+            ?.select("span")
+            ?.map { it.text().trim() }
+            ?.firstOrNull {
+                it.equals("Completo", ignoreCase = true) ||
+                    it.equals("Em andamento", ignoreCase = true)
+            }
+
         status = when {
-            pageText.contains("Completo", ignoreCase = true) -> SManga.COMPLETED
-            pageText.contains("Em andamento", ignoreCase = true) -> SManga.ONGOING
+            statusText.equals("Completo", ignoreCase = true) -> SManga.COMPLETED
+            statusText.equals("Em andamento", ignoreCase = true) -> SManga.ONGOING
             else -> status
         }
 
         author = findLabelValue(document, "Autor") ?: author
-        artist = findLabelValue(document, "Arte") ?: artist
+        artist = document.selectFirst("p:matchesOwn(^\\s*Arte:\\s*$) span")
+            ?.text()
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?: artist
     }
 
     private fun findLabelValue(document: Document, label: String): String? {
@@ -127,7 +140,7 @@ abstract class BodinhoYaoi : KeiSource() {
     }
 
     private fun parseChapters(document: Document): List<SChapter> = document
-        .select("a[href*='/capitulo/']")
+        .select("section[aria-labelledby='capitulos'] a[href*='/capitulo/']:has(span.block.truncate)")
         .distinctBy { it.attr("href") }
         .mapNotNull { element ->
             val href = element.attr("abs:href").ifBlank { element.attr("href") }
@@ -138,14 +151,7 @@ abstract class BodinhoYaoi : KeiSource() {
                 ?.text()
                 ?.trim()
                 ?.takeIf { it.isNotBlank() }
-                ?: element.selectFirst("span.text-xs.font-bold")
-                    ?.text()
-                    ?.trim()
-                    ?.takeIf { it.isNotBlank() }
-                ?: element.text()
-                    .replace(Regex("\\s*\\d+\\s*págs?\\.?$", RegexOption.IGNORE_CASE), "")
-                    .trim()
-                    .ifBlank { "Capítulo $slug" }
+                ?: "Capítulo $slug"
 
             SChapter.create().apply {
                 setUrlWithoutDomain(href)
