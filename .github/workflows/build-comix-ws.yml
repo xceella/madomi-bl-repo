@@ -63,8 +63,15 @@ jobs:
           OUT='repo/comix-ws/apk/tachiyomi-all.comixto-v1.4.49-ws.apk'
           cp "$APK" "$OUT"
 
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
-          FINGERPRINT=$($APKSIGNER verify --print-certs "$OUT" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1 | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          CERT_OUTPUT=$($APKSIGNER verify --print-certs "$OUT" 2>&1 || true)
+          echo "$CERT_OUTPUT"
+          FINGERPRINT=$(echo "$CERT_OUTPUT" | grep -i 'SHA-256 digest' | head -1 | sed 's/.*: //' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          if [ -z "$FINGERPRINT" ]; then
+            KEYTOOL_OUTPUT=$(keytool -printcert -jarfile "$OUT" 2>&1 || true)
+            echo "$KEYTOOL_OUTPUT"
+            FINGERPRINT=$(echo "$KEYTOOL_OUTPUT" | grep -i 'SHA256:' | head -1 | sed 's/.*SHA256:[[:space:]]*//' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          fi
           if [ -z "$FINGERPRINT" ]; then
             echo 'Could not determine signing fingerprint'
             exit 1
@@ -106,7 +113,7 @@ jobs:
           src.mirrorUrls.append('https://comix.to')
 
           data = idx.SerializeToString()
-          with gzip.open('repo/comix-ws/index.pb', 'wb', mtime=0) as f:
+          with gzip.GzipFile('repo/comix-ws/index.pb', 'wb', mtime=0) as f:
               f.write(data)
           PY
 
