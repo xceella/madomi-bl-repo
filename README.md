@@ -1,11 +1,12 @@
-# Madomi BL Repo
+# Xceella BL Repo
 
-Repositório personalizado para o Madomi focado em BL/manhwa, com fontes em inglês e PT-BR.
+Repositório próprio para Madomi/Mihon focado em BL/manhwa, com extensões em inglês e PT-BR compiladas e assinadas pela nossa chave.
 
-## Índice principal — Keiyoushi filtrado
+## Índice principal
 
-URL:
 `https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/index.pb`
+
+O catálogo raiz não aponta mais para APK/JAR oficiais de terceiros. As extensões abaixo são compiladas a partir do código aberto upstream e publicadas nos Releases deste repositório com a assinatura própria do Xceella BL Repo.
 
 ### Fontes em inglês
 - YaoiScan
@@ -24,40 +25,53 @@ URL:
 - Portal Yaoi
 - XXX Yaoi
 
-O MangaDex permanece no mesmo pacote e inclui fontes EN e PT-BR.
+O MangaDex inclui múltiplos idiomas, entre eles EN e PT-BR.
 
-Os APKs/JARs dessas fontes continuam sendo baixados dos releases oficiais do Keiyoushi; o índice raiz segue usando a assinatura oficial do projeto enquanto nossa infraestrutura própria é desenvolvida.
+## Assinatura própria
 
-## Nova infraestrutura — Xceella BL Extensions
+Fingerprint SHA-256 do repositório:
 
-Estamos migrando gradualmente para extensões compiladas e assinadas por uma chave própria, para podermos manter fontes vindas de projetos diferentes sob a mesma identidade de assinatura e criar extensões novas quando necessário.
+`7A:41:E1:29:8A:15:1D:48:F4:9A:A7:58:08:7E:9B:A3:F8:5E:C0:BF:57:EC:8B:2B:93:C7:54:87:81:D3:18:50`
 
-Primeiro teste: **Comix**.
+Como os package names são preservados para manter compatibilidade com as fontes originais, uma extensão instalada anteriormente com a assinatura do Keiyoushi/terceiro precisa ser desinstalada uma vez antes de instalar a nossa build. Depois disso, atualizações futuras do XBL usam a mesma assinatura própria.
 
-O índice de testes é:
-`https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/owned/index.pb`
+## Build e manutenção
 
-A automação está em `.github/workflows/build-owned-comix.yml` e a configuração está documentada em `OWNED-EXTENSIONS-SETUP.md`.
+A lista oficial de fontes está em:
 
-O índice próprio (`/owned/index.pb`) é separado do índice principal para que os testes não quebrem o catálogo estável.
+`catalog/sources.json`
 
-## Índice legado de teste — Comix externo
+O workflow principal está em:
 
-URL:
-`https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/comix/index.pb`
+`.github/workflows/build-xbl-catalog.yml`
 
-Esse índice antigo aponta para a build externa do MHRepo/MarBou e foi mantido apenas como registro do teste anterior. A meta agora é substituir isso por builds nossas, assinadas por nossa própria chave.
+Ele:
+1. baixa o código atual do Keiyoushi;
+2. valida os módulos selecionados;
+3. compila todas as extensões com nossa keystore;
+4. gera APK e JAR assinados por nós;
+5. publica os artefatos nos Releases deste repositório;
+6. gera `index.json`, `index.pb` e `repo.json` próprios;
+7. só substitui o catálogo raiz quando todo o processo termina com sucesso.
 
-## Fontes para usar pelo Madomi Web Reader
+Alterações no catálogo ou no tooling principal disparam uma nova build automaticamente. O workflow também pode ser executado manualmente pelo GitHub Actions.
 
-Por enquanto, sem extensão Mihon/Madomi atual confirmada:
+## Extensões próprias futuras
+
+Quando uma fonte útil não existir em um projeto upstream, ela pode ser implementada diretamente para este repositório seguindo a arquitetura atual do Keiyoushi/Mihon.
+
+Primeiros candidatos:
+- Bodinho Yaoi — `https://bodinhoyaoi.com/`
 - DesireScans — `https://desirescans.com/`
 - SpringToons — `https://springtoons.com/`
 - QToon — `https://qtoon.org/`
-- Bodinho Yaoi — `https://bodinhoyaoi.com/`
 
-O Bodinho Yaoi já possui pedido de fonte no Keiyoushi, mas ainda não há extensão pronta confirmada. Ele é candidato para uma extensão própria futura.
+O Bodinho Yaoi já possui pedido de fonte no Keiyoushi, mas ainda não há extensão pronta confirmada; por isso é o candidato principal para nossa primeira extensão criada do zero.
+
+## Testes antigos de Comix
+
+As pastas `comix/`, `comix-ws/` e `owned/` registram experimentos anteriores com Comix e com a infraestrutura de assinatura. Elas não são o catálogo raiz atual.
 
 ## Licenças e atribuições
 
-Consulte `THIRD_PARTY.md` para os projetos de código aberto usados como base/referência.
+Consulte `THIRD_PARTY.md`. Código derivado de projetos externos deve preservar as licenças e atribuições correspondentes.
