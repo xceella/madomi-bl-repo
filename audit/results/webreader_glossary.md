@@ -1,6 +1,6 @@
 # XBL — Web Reader glossary
 
-Generated: 2026-10-16T02:18:32Z
+Generated: 2026-10-16T02:20:51Z
 
 ## Fontes bloqueadas na execução
 
@@ -22,7 +22,6 @@ Generated: 2026-10-16T02:18:32Z
 | Bad Apple | DesireScans | multi/EN | complete | 47 | 47 | https://desirescans.com/series/comic/bad-apple |
 | Between the Lines | DesireScans | multi/EN | complete | 99 | 99 | https://desirescans.com/series/comic/between-the-lines |
 | Blossoms of the White Night | DesireScans | multi/EN | complete | 30 | 30 | https://desirescans.com/series/comic/blossoms-of-the-white-night |
-| Boyfriends. | DesireScans | multi/EN | complete | 44 | 44 | https://desirescans.com/series/comic/bad-friend |
 | Can't Think Straight | DesireScans | multi/EN | complete | 129 | 129 | https://desirescans.com/series/comic/cant-think-straight |
 | Cherry Blossoms After Winter | DesireScans | multi/EN | complete | 182 | 182 | https://desirescans.com/series/comic/cherry-blossoms-after-winter |
 | Circuit Breaker | DesireScans | multi/EN | complete | 62 | 62 | https://desirescans.com/series/comic/circuit-breaker |
@@ -45,7 +44,6 @@ Generated: 2026-10-16T02:18:32Z
 | How the Broken Love | DesireScans | multi/EN | complete | 12 | 12 | https://desirescans.com/series/comic/how-the-broken-love |
 | How to Win Over Your Crush | DesireScans | multi/EN | complete | 40 | 40 | https://desirescans.com/series/comic/how-to-win-over-your-crush |
 | Kill Me If You Can | DesireScans | multi/EN | complete | 107 | 107 | https://desirescans.com/series/comic/kill-me-if-you-can |
-| Love Junkie | DesireScans | multi/EN | complete | 87 | 87 | https://desirescans.com/series/comic/love-jinx |
 | Master-Peace | DesireScans | multi/EN | complete | 24 | 24 | https://desirescans.com/series/comic/master-peace |
 | Melting Point | DesireScans | multi/EN | complete | 36 | 36 | https://desirescans.com/series/comic/melting-point |
 | Melting Point (Pibi) | DesireScans | multi/EN | complete | 36 | 36 | https://desirescans.com/series/comic/melting-point |
@@ -55,8 +53,6 @@ Generated: 2026-10-16T02:18:32Z
 | Order Up! | DesireScans | multi/EN | complete | 39 | 39 | https://desirescans.com/series/comic/order-up |
 | Our Sunny Days | DesireScans | multi/EN | complete | 78 | 78 | https://desirescans.com/series/comic/our-sunny-days |
 | Passion | DesireScans | multi/EN | complete | 143 | 142 | https://desirescans.com/series/comic/passion |
-| Paws & Claws | DesireScans | multi/EN | complete | 76 | 76 | https://desirescans.com/series/comic/paws-claws |
-| Pearl Boy | DesireScans | multi/EN | complete | 56 | 56 | https://desirescans.com/series/comic/pearl-boy-ignite-the-dawn |
 | Pearl Boy: Ignite the Dawn | DesireScans | multi/EN | complete | 56 | 56 | https://desirescans.com/series/comic/pearl-boy-ignite-the-dawn |
 | Pure Intentions | DesireScans | multi/EN | complete | 46 | 46 | https://desirescans.com/series/comic/pure-intentions |
 | Quo Vadis, Domine? | DesireScans | multi/EN | complete | 22 | 22 | https://desirescans.com/series/comic/quo-vadis-domine |
@@ -64,19 +60,14 @@ Generated: 2026-10-16T02:18:32Z
 | Semantic Error | DesireScans | multi/EN | complete | 103 | 103 | https://desirescans.com/series/comic/semantic-error |
 | Stranger Than Friends | DesireScans | multi/EN | complete | 132 | 132 | https://desirescans.com/series/comic/stranger-than-friends |
 | The Hunter's Gonna Lay Low | DesireScans | multi/EN | complete | 74 | 74 | https://desirescans.com/series/comic/the-hunters-gonna-lay-low |
-| The Secretive XX | DesireScans | multi/EN | complete | 4 | 3 | https://desirescans.com/series/comic/live-now-xxx-cam |
 | The Taming | DesireScans | multi/EN | complete | 39 | 39 | https://desirescans.com/series/comic/the-taming |
 | Unsleep | DesireScans | multi/EN | complete | 81 | 81 | https://desirescans.com/series/comic/unsleep |
 | Virtual Strangers | DesireScans | multi/EN | complete | 113 | 113 | https://desirescans.com/series/comic/virtual-strangers |
-| Virtual Strangers Extended | DesireScans | multi/EN | complete | 113 | 113 | https://desirescans.com/series/comic/virtual-strangers |
 | Wet Sand | DesireScans | multi/EN | complete | 101 | 101 | https://desirescans.com/series/comic/wet-sand |
 | You Are My World | DesireScans | multi/EN | complete | 33 | 33 | https://desirescans.com/series/comic/you-are-my-world |
 | You Are So Lovely | DesireScans | multi/EN | complete | 55 | 55 | https://desirescans.com/series/comic/you-are-so-lovely |
 | Don't Lie to Me | DesireScans | multi/EN | complete | 53 | 64 | https://desirescans.com/series/comic/dont-lie-to-me |
-| Guiding Me Crazy | DesireScans | multi/EN | complete | 22 | 22 | https://desirescans.com/series/comic/guiding-me-mad |
-| Hit and Hard | DesireScans | multi/EN | complete | 42 | 42 | https://desirescans.com/series/comic/hit-me-hard |
 | My Bad Boss | DesireScans | multi/EN | complete | 37 | 37 | https://desirescans.com/series/comic/my-bad-boss |
-| My Idol Diary | DesireScans | multi/EN | complete | 21 | 21 | https://desirescans.com/series/comic/my-doll-diary |
 | Not Meant to Be | DesireScans | multi/EN | complete | 20 | 20 | https://desirescans.com/series/comic/not-meant-to-be |
 | Olympian | DesireScans | multi/EN | complete | 28 | 27 | https://desirescans.com/series/comic/olympian |
 | Second Half | DesireScans | multi/EN | complete | 28 | 28 | https://desirescans.com/series/comic/second-half |
@@ -86,4 +77,3 @@ Generated: 2026-10-16T02:18:32Z
 | Comfortable Confinement | DesireScans | multi/EN | complete | 40 | 40 | https://desirescans.com/series/comic/unlocking-a-comfy-captivity |
 | Desire Me If You Can | DesireScans | multi/EN | complete | 30 | 30 | https://desirescans.com/series/comic/desire-me-if-you-can |
 | Omega Complex | DesireScans | multi/EN | complete | 51 | 51 | https://desirescans.com/series/comic/omegacomplex |
-| The Armifkan | DesireScans | multi/EN | complete | 39 | 39 | https://desirescans.com/series/comic/the-taming |

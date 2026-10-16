@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T02:18:32Z",
+  "generated_at": "2026-10-16T02:20:51Z",
   "unavailable_sources": [
     {
       "source": "SpringToons",
@@ -216,6 +216,15 @@
       "found": true
     },
     {
+      "title_id": 19,
+      "title": "Between the Lines",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/between-the-lines"
+    },
+    {
       "matched_title": "Blossoms of the White Night",
       "url": "https://desirescans.com/series/comic/blossoms-of-the-white-night",
       "site_status": "complete",
@@ -232,20 +241,13 @@
       "found": true
     },
     {
-      "matched_title": "Bad Friend",
-      "url": "https://desirescans.com/series/comic/bad-friend",
-      "site_status": "complete",
-      "chapter_count": 44,
-      "latest_chapter": "44",
-      "latest_number": 44.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 21,
-      "title": "Boyfriends.",
+      "title_id": 20,
+      "title": "Blossoms of the White Night",
       "user_status": "Quero ler",
-      "source": "DesireScans",
+      "source": "Qtoon",
       "source_type": "Web Reader",
-      "found": true
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/blossoms-of-the-white-night"
     },
     {
       "matched_title": "Can't Think Straight",
@@ -296,6 +298,15 @@
       "found": true
     },
     {
+      "title_id": 25,
+      "title": "Circuit Breaker",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/circuit-breaker"
+    },
+    {
       "matched_title": "Codename Anastasia",
       "url": "https://desirescans.com/series/comic/codename-anastasia",
       "site_status": "complete",
@@ -342,6 +353,15 @@
       "source": "DesireScans",
       "source_type": "Web Reader",
       "found": true
+    },
+    {
+      "title_id": 29,
+      "title": "Define the Relationship",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/define-the-relationship"
     },
     {
       "matched_title": "Degenerate",
@@ -440,6 +460,15 @@
       "found": true
     },
     {
+      "title_id": 35,
+      "title": "FlashLight",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/flashlight"
+    },
+    {
       "matched_title": "Foul's Start",
       "url": "https://desirescans.com/series/comic/fouls-start",
       "site_status": "complete",
@@ -454,6 +483,15 @@
       "source": "DesireScans",
       "source_type": "Web Reader",
       "found": true
+    },
+    {
+      "title_id": 37,
+      "title": "Foul's Start",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/fouls-start"
     },
     {
       "matched_title": "Fragment of the Moon",
@@ -600,22 +638,6 @@
       "found": true
     },
     {
-      "matched_title": "Love Jinx",
-      "url": "https://desirescans.com/series/comic/love-jinx",
-      "site_status": "complete",
-      "chapter_count": 87,
-      "latest_chapter": "87",
-      "latest_number": 87.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 50,
-      "title": "Love Junkie",
-      "user_status": "Quero ler",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
       "matched_title": "Master-Peace",
       "url": "https://desirescans.com/series/comic/master-peace",
       "site_status": "complete",
@@ -648,6 +670,15 @@
       "found": true
     },
     {
+      "title_id": 52,
+      "title": "Melting Point",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/melting-point"
+    },
+    {
       "matched_title": "Melting Point",
       "url": "https://desirescans.com/series/comic/melting-point",
       "site_status": "complete",
@@ -662,6 +693,15 @@
       "source": "DesireScans",
       "source_type": "Web Reader",
       "found": true
+    },
+    {
+      "title_id": 53,
+      "title": "Melting Point (Pibi)",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/melting-point"
     },
     {
       "matched_title": "My Sadistic Master",
@@ -744,6 +784,15 @@
       "found": true
     },
     {
+      "title_id": 59,
+      "title": "Our Sunny Days",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/our-sunny-days"
+    },
+    {
       "matched_title": "PASSION",
       "url": "https://desirescans.com/series/comic/passion",
       "site_status": "complete",
@@ -754,38 +803,6 @@
       "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
       "title_id": 60,
       "title": "Passion",
-      "user_status": "Quero ler",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
-      "matched_title": "Paws & Claws",
-      "url": "https://desirescans.com/series/comic/paws-claws",
-      "site_status": "complete",
-      "chapter_count": 76,
-      "latest_chapter": "76",
-      "latest_number": 76.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 61,
-      "title": "Paws & Claws",
-      "user_status": "Quero ler",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
-      "matched_title": "Pearl Boy: Ignite the Dawn",
-      "url": "https://desirescans.com/series/comic/pearl-boy-ignite-the-dawn",
-      "site_status": "complete",
-      "chapter_count": 56,
-      "latest_chapter": "56",
-      "latest_number": 56.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 62,
-      "title": "Pearl Boy",
       "user_status": "Quero ler",
       "source": "DesireScans",
       "source_type": "Web Reader",
@@ -856,6 +873,24 @@
       "found": true
     },
     {
+      "title_id": 67,
+      "title": "Red Thread Quest",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/red-thread-quest"
+    },
+    {
+      "title_id": 68,
+      "title": "Release Your Persona",
+      "user_status": "Quero ler / prioridade",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/release-your-persona"
+    },
+    {
       "matched_title": "Semantic Error",
       "url": "https://desirescans.com/series/comic/semantic-error",
       "site_status": "complete",
@@ -888,6 +923,15 @@
       "found": true
     },
     {
+      "title_id": 70,
+      "title": "Stranger Than Friends",
+      "user_status": "Quero ler",
+      "source": "Qtoon",
+      "source_type": "Web Reader",
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/stranger-than-friends"
+    },
+    {
       "matched_title": "The Hunters Gonna Lay Low",
       "url": "https://desirescans.com/series/comic/the-hunters-gonna-lay-low",
       "site_status": "complete",
@@ -904,20 +948,13 @@
       "found": true
     },
     {
-      "matched_title": "Live Now: XXX CAM",
-      "url": "https://desirescans.com/series/comic/live-now-xxx-cam",
-      "site_status": "complete",
-      "chapter_count": 4,
-      "latest_chapter": "3",
-      "latest_number": 3.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
       "title_id": 72,
       "title": "The Secretive XX",
       "user_status": "Quero ler",
-      "source": "DesireScans",
+      "source": "Qtoon",
       "source_type": "Web Reader",
-      "found": true
+      "found": false,
+      "notes": "HTTPError: 404 Client Error: Not Found for url: https://qtoon.org/manga/the-secretive-xx"
     },
     {
       "matched_title": "The Taming",
@@ -962,22 +999,6 @@
       "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
       "title_id": 75,
       "title": "Virtual Strangers",
-      "user_status": "Quero ler",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
-      "matched_title": "Virtual Strangers",
-      "url": "https://desirescans.com/series/comic/virtual-strangers",
-      "site_status": "complete",
-      "chapter_count": 113,
-      "latest_chapter": "113",
-      "latest_number": 113.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 76,
-      "title": "Virtual Strangers Extended",
       "user_status": "Quero ler",
       "source": "DesireScans",
       "source_type": "Web Reader",
@@ -1048,38 +1069,6 @@
       "found": true
     },
     {
-      "matched_title": "Guiding Me Mad",
-      "url": "https://desirescans.com/series/comic/guiding-me-mad",
-      "site_status": "complete",
-      "chapter_count": 22,
-      "latest_chapter": "22",
-      "latest_number": 22.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 82,
-      "title": "Guiding Me Crazy",
-      "user_status": "Novos/Recentes",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
-      "matched_title": "Hit Me Hard",
-      "url": "https://desirescans.com/series/comic/hit-me-hard",
-      "site_status": "complete",
-      "chapter_count": 42,
-      "latest_chapter": "42",
-      "latest_number": 42.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 83,
-      "title": "Hit and Hard",
-      "user_status": "Novos/Recentes",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
       "matched_title": "My Bad Boss",
       "url": "https://desirescans.com/series/comic/my-bad-boss",
       "site_status": "complete",
@@ -1090,22 +1079,6 @@
       "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
       "title_id": 87,
       "title": "My Bad Boss",
-      "user_status": "Novos/Recentes",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
-      "matched_title": "My Doll Diary",
-      "url": "https://desirescans.com/series/comic/my-doll-diary",
-      "site_status": "complete",
-      "chapter_count": 21,
-      "latest_chapter": "21",
-      "latest_number": 21.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 88,
-      "title": "My Idol Diary",
       "user_status": "Novos/Recentes",
       "source": "DesireScans",
       "source_type": "Web Reader",
@@ -1251,22 +1224,6 @@
       "title_id": 102,
       "title": "Omega Complex",
       "user_status": "Discutido/interesse",
-      "source": "DesireScans",
-      "source_type": "Web Reader",
-      "found": true
-    },
-    {
-      "matched_title": "The Taming",
-      "url": "https://desirescans.com/series/comic/the-taming",
-      "site_status": "complete",
-      "chapter_count": 39,
-      "latest_chapter": "39",
-      "latest_number": 39.0,
-      "language": "multi/EN",
-      "notes": "Web Reader; capítulos derivados do sitemap oficial do site",
-      "title_id": 104,
-      "title": "The Armifkan",
-      "user_status": "Título citado — grafia a confirmar",
       "source": "DesireScans",
       "source_type": "Web Reader",
       "found": true
