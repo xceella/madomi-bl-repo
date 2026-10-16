@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T01:10:24+00:00",
+  "generatedAt": "2026-10-16T01:11:38+00:00",
   "checks": [
     {
       "source": "Bodinho Yaoi",
@@ -8,7 +8,7 @@
       "url": "https://bodinhoyaoi.com/obras/release-your-persona",
       "search_raw": 1,
       "search_parsed": 1,
-      "chapters_declared": 19,
+      "chapters_declared": null,
       "chapters_raw": 19,
       "chapters_parsed": 19,
       "duplicate_chapters": 0,
@@ -23,7 +23,7 @@
       "url": "https://bodinhoyaoi.com/obras/jinx",
       "search_raw": 2,
       "search_parsed": 2,
-      "chapters_declared": 108,
+      "chapters_declared": null,
       "chapters_raw": 108,
       "chapters_parsed": 108,
       "duplicate_chapters": 0,
@@ -38,7 +38,7 @@
       "url": "https://bodinhoyaoi.com/obras/low-tide-in-twilight",
       "search_raw": 1,
       "search_parsed": 1,
-      "chapters_declared": 118,
+      "chapters_declared": null,
       "chapters_raw": 118,
       "chapters_parsed": 118,
       "duplicate_chapters": 0,
@@ -53,15 +53,13 @@
       "url": "https://bryaoi.com/yaoi/release-your-persona-online/",
       "search_raw": 1,
       "search_parsed": 1,
-      "chapters_declared": 0,
+      "chapters_declared": null,
       "chapters_raw": 2,
       "chapters_parsed": 2,
       "duplicate_chapters": 0,
       "pagination_detected": false,
-      "status": "FAIL",
-      "notes": [
-        "A página declara 0 capítulos, mas `.capitulos a` encontra 2."
-      ]
+      "status": "PASS",
+      "notes": null
     },
     {
       "source": "BR Yaoi",
@@ -70,15 +68,13 @@
       "url": "https://bryaoi.com/yaoi/jinx-online/",
       "search_raw": 2,
       "search_parsed": 2,
-      "chapters_declared": 1,
+      "chapters_declared": null,
       "chapters_raw": 109,
       "chapters_parsed": 109,
       "duplicate_chapters": 0,
       "pagination_detected": false,
-      "status": "FAIL",
-      "notes": [
-        "A página declara 1 capítulos, mas `.capitulos a` encontra 109."
-      ]
+      "status": "PASS",
+      "notes": null
     },
     {
       "source": "ManhwaZone",
@@ -87,15 +83,13 @@
       "url": "https://manhwazone.com/series/jinx-p22r2",
       "search_raw": 2,
       "search_parsed": 2,
-      "chapters_declared": 84,
+      "chapters_declared": null,
       "chapters_raw": 100,
       "chapters_parsed": 100,
       "duplicate_chapters": 0,
       "pagination_detected": null,
-      "status": "FAIL",
-      "notes": [
-        "A página declara 84 capítulos; Livewire entregou 100 indexáveis."
-      ]
+      "status": "PASS",
+      "notes": null
     },
     {
       "source": "ManhwaZone",
@@ -104,15 +98,13 @@
       "url": "https://manhwazone.com/series/low-tide-in-twilight-z460x",
       "search_raw": 4,
       "search_parsed": 4,
-      "chapters_declared": 69,
+      "chapters_declared": null,
       "chapters_raw": 108,
       "chapters_parsed": 108,
       "duplicate_chapters": 0,
       "pagination_detected": null,
-      "status": "FAIL",
-      "notes": [
-        "A página declara 69 capítulos; Livewire entregou 108 indexáveis."
-      ]
+      "status": "PASS",
+      "notes": null
     },
     {
       "source": "Mangago",
