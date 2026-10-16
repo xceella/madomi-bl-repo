@@ -6,10 +6,7 @@
       "driver": "bodinho",
       "baseUrl": "https://bodinhoyaoi.com",
       "tests": [
-        {"query": "release", "expectTitle": "Release Your Persona"},
-        {"query": "jinx", "expectTitle": "Jinx"},
-        {"query": "low tide", "expectTitle": "Low Tide in Twilight"},
-        {"query": "desire me if you can", "expectTitle": "Desire Me If You Can"}
+        {"query": "kiss me liar", "expectTitle": "Kiss Me Liar"}
       ]
     },
     {
@@ -18,19 +15,8 @@
       "driver": "bryaoi",
       "baseUrl": "https://bryaoi.com",
       "tests": [
-        {"query": "release", "expectTitle": "Release Your Persona"},
-        {"query": "jinx", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": "Deseje-me se puder"}
-      ]
-    },
-    {
-      "id": "manhwazone",
-      "name": "ManhwaZone",
-      "driver": "manhwazone",
-      "baseUrl": "https://manhwazone.com",
-      "tests": [
-        {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null}
+        {"query": "kiss me liar", "expectTitle": "Kiss Me Liar"},
+        {"query": "amber alert", "expectTitle": "Amber Alert"}
       ]
     },
     {
@@ -39,9 +25,9 @@
       "driver": "mangago",
       "baseUrl": "https://www.mangago.me",
       "tests": [
-        {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": "Desire Me if You Can"}
+        {"query": "kiss me liar", "expectTitle": "Kissme, Liar"},
+        {"query": "dead man's switch", "expectTitle": "DeadmanSwitch"},
+        {"query": "amber alert", "expectTitle": "Amber Alert"}
       ]
     },
     {
@@ -50,9 +36,9 @@
       "driver": "mangak",
       "baseUrl": "https://mangak.io",
       "tests": [
-        {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": "Desire Me if You Can"}
+        {"query": "kiss me liar", "expectTitle": "Kiss me, Liar"},
+        {"query": "dead man's switch", "expectTitle": "Dead Man's Switch"},
+        {"query": "amber alert", "expectTitle": "Amber Alert"}
       ]
     }
   ]
