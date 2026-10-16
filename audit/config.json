@@ -1,0 +1,55 @@
+{
+  "sources": [
+    {
+      "id": "bodinhoyaoi",
+      "name": "Bodinho Yaoi",
+      "driver": "bodinho",
+      "baseUrl": "https://bodinhoyaoi.com",
+      "tests": [
+        {"query": "release", "expectTitle": "Release Your Persona"},
+        {"query": "jinx", "expectTitle": "Jinx"},
+        {"query": "low tide", "expectTitle": "Low Tide in Twilight"}
+      ]
+    },
+    {
+      "id": "bryaoi",
+      "name": "BR Yaoi",
+      "driver": "bryaoi",
+      "baseUrl": "https://bryaoi.com",
+      "tests": [
+        {"query": "release", "expectTitle": "Release Your Persona"},
+        {"query": "jinx", "expectTitle": null}
+      ]
+    },
+    {
+      "id": "manhwazone",
+      "name": "ManhwaZone",
+      "driver": "manhwazone",
+      "baseUrl": "https://manhwazone.com",
+      "tests": [
+        {"query": "jinx", "expectTitle": null},
+        {"query": "low tide", "expectTitle": null}
+      ]
+    },
+    {
+      "id": "mangago",
+      "name": "Mangago",
+      "driver": "mangago",
+      "baseUrl": "https://www.mangago.me",
+      "tests": [
+        {"query": "jinx", "expectTitle": null},
+        {"query": "low tide", "expectTitle": null}
+      ]
+    },
+    {
+      "id": "mangak",
+      "name": "MangaK",
+      "driver": "mangak",
+      "baseUrl": "https://mangak.io",
+      "tests": [
+        {"query": "jinx", "expectTitle": null},
+        {"query": "low tide", "expectTitle": null}
+      ]
+    }
+  ]
+}
