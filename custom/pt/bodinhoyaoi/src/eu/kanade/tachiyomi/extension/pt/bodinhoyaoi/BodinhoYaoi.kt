@@ -37,11 +37,52 @@ abstract class BodinhoYaoi : KeiSource() {
     override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList): MangasPage {
         if (query.isBlank()) return getPopularManga(page)
 
-        val url = "$baseUrl/busca".toHttpUrl().newBuilder()
-            .addQueryParameter("q", query)
-            .build()
-        val document = client.get(url).asJsoup()
-        return MangasPage(parseMangaCards(document), false)
+        // The dynamic /busca route can intermittently stall long enough to hit
+        // Madomi's 30 second source timeout. The sitemap is static, fast and
+        // contains every work URL, so use it as the search index instead.
+        val document = client.get("$baseUrl/sitemap.xml").asJsoup()
+        return MangasPage(searchFromSitemap(document, query), false)
+    }
+
+    private fun searchFromSitemap(document: Document, query: String): List<SManga> {
+        val normalizedQuery = query.trim().lowercase()
+        val slugQuery = normalizedQuery
+            .replace(Regex("[^\\p{L}\\p{N}]+"), "-")
+            .trim('-')
+
+        return document
+            .select("loc")
+            .map { it.text().trim() }
+            .filter { it.contains("/obras/") && !it.contains("/capitulo/") }
+            .distinct()
+            .mapNotNull { url ->
+                val slug = url.substringAfter("/obras/", "").substringBefore('/').trim()
+                if (slug.isBlank()) return@mapNotNull null
+
+                val searchableTitle = slug.replace('-', ' ').lowercase()
+                val matches = slug.contains(slugQuery, ignoreCase = true) ||
+                    searchableTitle.contains(normalizedQuery)
+                if (!matches) return@mapNotNull null
+
+                val title = slug
+                    .split('-')
+                    .filter { it.isNotBlank() }
+                    .joinToString(" ") { word ->
+                        word.replaceFirstChar { char ->
+                            if (char.isLowerCase()) char.titlecase() else char.toString()
+                        }
+                    }
+
+                SManga.create().apply {
+                    setUrlWithoutDomain("/obras/$slug")
+                    this.title = title
+                    thumbnail_url = "https://media.bodinhoyaoi.com/$slug/cover-thumb.webp"
+                }
+            }
+            .sortedBy { manga ->
+                val slug = manga.url.substringAfterLast('/')
+                if (slug.equals(slugQuery, ignoreCase = true)) 0 else 1
+            }
     }
 
     private fun mangaListParse(document: Document, page: Int): MangasPage {
