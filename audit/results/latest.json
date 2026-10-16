@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T01:11:38+00:00",
+  "generatedAt": "2026-10-16T01:16:58+00:00",
   "checks": [
     {
       "source": "Bodinho Yaoi",
@@ -47,6 +47,21 @@
       "notes": null
     },
     {
+      "source": "Bodinho Yaoi",
+      "query": "desire me if you can",
+      "title": "Desire Me If You Can",
+      "url": "https://bodinhoyaoi.com/obras/desire-me-if-you-can",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": null,
+      "chapters_raw": 21,
+      "chapters_parsed": 21,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
       "source": "BR Yaoi",
       "query": "release",
       "title": "Release Your Persona",
@@ -71,6 +86,21 @@
       "chapters_declared": null,
       "chapters_raw": 109,
       "chapters_parsed": 109,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "BR Yaoi",
+      "query": "desire me if you can",
+      "title": "Deseje-me se puder",
+      "url": "https://bryaoi.com/yaoi/deseje-me-se-puder-online/",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": null,
+      "chapters_raw": 226,
+      "chapters_parsed": 226,
       "duplicate_chapters": 0,
       "pagination_detected": false,
       "status": "PASS",
@@ -107,6 +137,21 @@
       "notes": null
     },
     {
+      "source": "ManhwaZone",
+      "query": "desire me if you can",
+      "title": "Teach Me How to Desire",
+      "url": "https://manhwazone.com/series/teach-me-how-to-desire-k3m1g",
+      "search_raw": 24,
+      "search_parsed": 24,
+      "chapters_declared": null,
+      "chapters_raw": 76,
+      "chapters_parsed": 76,
+      "duplicate_chapters": 0,
+      "pagination_detected": null,
+      "status": "PASS",
+      "notes": null
+    },
+    {
       "source": "Mangago",
       "query": "jinx",
       "title": "The Jinx's Lover",
@@ -137,6 +182,21 @@
       "notes": null
     },
     {
+      "source": "Mangago",
+      "query": "desire me if you can",
+      "title": "Tell Me You Can Hear It",
+      "url": "https://www.mangago.me/read-manga/tell_me_you_can_hear_it/",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": 32,
+      "chapters_raw": 32,
+      "chapters_parsed": 32,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
       "source": "MangaK",
       "query": "jinx",
       "title": "Jinx",
@@ -161,6 +221,21 @@
       "chapters_declared": null,
       "chapters_raw": 176,
       "chapters_parsed": 176,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "MangaK",
+      "query": "desire me if you can",
+      "title": "Desire Me if You Can",
+      "url": "https://mangak.io/desire-me-if-you-can",
+      "search_raw": 24,
+      "search_parsed": 24,
+      "chapters_declared": null,
+      "chapters_raw": 35,
+      "chapters_parsed": 35,
       "duplicate_chapters": 0,
       "pagination_detected": false,
       "status": "PASS",
