@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import csv,json,re,time,unicodedata
-from concurrent.futures import ThreadPoolExecutor,as_completed
+from concurrent.futures import ThreadPoolExecutor
 from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import urlparse
@@ -95,10 +95,9 @@ def detail_spring(s,item,cand):
 def detail_qtoon(s,item,cand):
  r=get(s,cand['url']); r.raise_for_status(); d=BeautifulSoup(r.text,'html.parser'); text=d.get_text(' ',strip=True)
  h=d.select_one('h1'); title=h.get_text(' ',strip=True) if h else cand['title']; st=parse_status_text(text)
- # Qtoon shows episode items and language tags in rendered HTML.
  labels=[]
  for t in d.find_all(string=re.compile(r'(?:EP\.|Chapter|Cap[ií]tulo|Odcinek)\s*\d+',re.I)):
-  tx=' '.join(str(t).split());
+  tx=' '.join(str(t).split())
   if tx and len(tx)<160: labels.append(tx)
  labels=list(dict.fromkeys(labels)); nums=[(num_from(x),x) for x in labels if num_from(x) is not None]; latest=max(nums,key=lambda x:x[0]) if nums else (None,labels[0] if labels else None)
  m=re.search(r'(\d+)\s+(?:Episodes|Epis[oó]dios|Odcinki|Rozdzia)',text,re.I); count=int(m.group(1)) if m else (len(labels) if labels else None)
@@ -108,10 +107,16 @@ def detail_qtoon(s,item,cand):
  return {'matched_title':title,'url':cand['url'],'site_status':st,'chapter_count':count,'latest_chapter':latest[1],'latest_number':latest[0],'language':'/'.join(langs) if langs else 'multi','notes':'Web Reader; Qtoon reúne idiomas por episódio'}
 
 def main():
- titles=json.loads(TITLES.read_text(encoding='utf-8')); s=sess(); catalogs={}; rows=[]
- print('Loading DesireScans sitemap...'); dc,dch=desires_catalog(s); catalogs['DesireScans']=dc
- print('Loading SpringToons sitemap...'); sc=spring_catalog(s); catalogs['SpringToons']=sc
- print('Loading Qtoon sitemap...'); qc=qtoon_catalog(s); catalogs['Qtoon']=qc
+ titles=json.loads(TITLES.read_text(encoding='utf-8')); s=sess(); catalogs={}; rows=[]; dch={}; unavailable=[]
+ try:
+  print('Loading DesireScans sitemap...'); dc,dch=desires_catalog(s); catalogs['DesireScans']=dc
+ except Exception as e: unavailable.append({'source':'DesireScans','error':f'{type(e).__name__}: {e}'})
+ try:
+  print('Loading SpringToons sitemap...'); sc=spring_catalog(s); catalogs['SpringToons']=sc
+ except Exception as e: unavailable.append({'source':'SpringToons','error':f'{type(e).__name__}: {e}'})
+ try:
+  print('Loading Qtoon sitemap...'); qc=qtoon_catalog(s); catalogs['Qtoon']=qc
+ except Exception as e: unavailable.append({'source':'Qtoon','error':f'{type(e).__name__}: {e}'})
  jobs=[]
  with ThreadPoolExecutor(max_workers=10) as ex:
   for item in titles:
@@ -126,12 +131,15 @@ def main():
    try:r=f.result(); r.update({'title_id':item['id'],'title':item['title'],'user_status':item['user_status'],'source':source,'source_type':'Web Reader','found':True}); rows.append(r)
    except Exception as e: rows.append({'title_id':item['id'],'title':item['title'],'user_status':item['user_status'],'source':source,'source_type':'Web Reader','found':False,'notes':f'{type(e).__name__}: {e}'})
  s.close(); rows.sort(key=lambda x:(x['title_id'],x['source']))
- payload={'generated_at':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'matches':rows}; (OUT/'webreader_glossary.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+ payload={'generated_at':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'unavailable_sources':unavailable,'matches':rows}; (OUT/'webreader_glossary.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
  fields=['title_id','title','user_status','source','source_type','found','matched_title','language','site_status','chapter_count','latest_chapter','latest_number','url','notes']
  with (OUT/'webreader_glossary.csv').open('w',newline='',encoding='utf-8-sig') as f:
   w=csv.DictWriter(f,fieldnames=fields);w.writeheader();[w.writerow({k:r.get(k) for k in fields}) for r in rows]
- lines=['# XBL — Web Reader glossary','',f"Generated: {payload['generated_at']}",'','| Title | Source | Language | Status | Count | Latest | URL |','|---|---|---|---|---:|---|---|']
+ lines=['# XBL — Web Reader glossary','',f"Generated: {payload['generated_at']}",'']
+ if unavailable:
+  lines += ['## Fontes bloqueadas na execução','']+[f"- **{x['source']}**: {x['error']}" for x in unavailable]+['']
+ lines += ['| Title | Source | Language | Status | Count | Latest | URL |','|---|---|---|---|---:|---|---|']
  for r in rows:
   if r.get('found'):lines.append(f"| {r['title']} | {r['source']} | {r.get('language','—')} | {r.get('site_status','unknown')} | {r.get('chapter_count') if r.get('chapter_count') is not None else '—'} | {r.get('latest_chapter') or '—'} | {r.get('url','')} |")
- (OUT/'webreader_glossary.md').write_text('\n'.join(lines),encoding='utf-8'); print(f'Done: {sum(1 for r in rows if r.get("found"))} positive matches')
+ (OUT/'webreader_glossary.md').write_text('\n'.join(lines),encoding='utf-8'); print(f'Done: {sum(1 for r in rows if r.get("found"))} positive matches; blocked={len(unavailable)}')
 if __name__=='__main__': main()
