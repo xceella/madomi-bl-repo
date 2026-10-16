@@ -18,13 +18,12 @@ def score(a,b):
  a,b=norm(a),norm(b)
  if not a or not b:return 0
  if a==b:return 1
- if a in b or b in a:return .92+.07*min(len(a),len(b))/max(len(a),len(b))
  return SequenceMatcher(None,a,b).ratio()
 def aliases(x):
  vals=[x['title']]+x.get('aliases',[])
  if '/' in x['title']:vals += [a.strip() for a in x['title'].split('/')]
  return [a for a in vals if a]
-def best(item,cands,cut=.72):
+def best(item,cands,cut=.93):
  hit=None; bs=0
  for c in cands:
   for a in aliases(item):
@@ -64,7 +63,7 @@ def spring_catalog(s):
 def qtoon_catalog(s):
  urls=xml_locs(s,'https://qtoon.org/sitemap-mangas.xml'); c=[]
  for u in urls:
-  m=re.search(r'/manga/\d+/([^/?#]+)',u)
+  m=re.search(r'/manga/(?:\d+/)?([^/?#]+)',u)
   if m:c.append({'title':slug_title(m.group(1)),'url':u,'slug':m.group(1)})
  return c
 
@@ -121,7 +120,7 @@ def main():
  with ThreadPoolExecutor(max_workers=10) as ex:
   for item in titles:
    for source,cat in catalogs.items():
-    cand=best(item,cat,.70)
+    cand=best(item,cat,.93)
     if not cand:continue
     if source=='DesireScans': fut=ex.submit(detail_desire,s,item,cand,dch)
     elif source=='SpringToons': fut=ex.submit(detail_spring,s,item,cand)
