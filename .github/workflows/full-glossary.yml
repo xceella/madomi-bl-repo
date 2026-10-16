@@ -1,0 +1,61 @@
+name: Build XBL full glossary
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'audit/glossary_titles.json'
+      - 'audit/full_glossary.py'
+      - '.github/workflows/full-glossary.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-xbl-glossary
+  cancel-in-progress: true
+
+jobs:
+  glossary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Instalar dependências
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 lxml
+
+      - name: Rodar glossário completo
+        run: python audit/full_glossary.py
+
+      - name: Publicar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-glossary
+          path: |
+            audit/results/full_glossary.json
+            audit/results/full_glossary.csv
+            audit/results/full_glossary.md
+
+      - name: Publicar resultados no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audit/results/full_glossary.json audit/results/full_glossary.csv audit/results/full_glossary.md
+
+          if git diff --cached --quiet; then
+            echo "Glossário sem alterações."
+            exit 0
+          fi
+
+          git commit -m "Update full BL glossary"
+          git push
