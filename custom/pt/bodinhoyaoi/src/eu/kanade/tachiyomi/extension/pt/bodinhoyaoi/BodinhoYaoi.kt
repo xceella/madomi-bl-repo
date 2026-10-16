@@ -51,8 +51,9 @@ abstract class BodinhoYaoi : KeiSource() {
     }
 
     private fun parseMangaCards(document: Document): List<SManga> = document
-        .select("a[href^='/obras/']:has(img[src*='/cover-thumb.'])")
-        .distinctBy { it.attr("href") }
+        .select("a[href*='/obras/']:has(img[src*='media.bodinhoyaoi.com'])")
+        .filterNot { it.attr("href").contains("/capitulo/") }
+        .distinctBy { it.attr("abs:href").ifBlank { it.attr("href") } }
         .mapNotNull(::mangaFromElement)
 
     private fun mangaFromElement(element: Element): SManga? {
@@ -60,8 +61,14 @@ abstract class BodinhoYaoi : KeiSource() {
         if (href.isBlank()) return null
 
         val image = element.selectFirst("img")
-        val title = element.selectFirst("strong")?.text()?.takeIf { it.isNotBlank() }
-            ?: image?.attr("alt")?.removePrefix("Capa de ")?.takeIf { it.isNotBlank() }
+        val title = element.selectFirst("h1, h2, h3, strong")
+            ?.text()
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?: image?.attr("alt")
+                ?.removePrefix("Capa de ")
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
             ?: return null
 
         return SManga.create().apply {
