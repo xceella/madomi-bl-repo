@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-10-16T01:10:24+00:00",
+  "checks": [
+    {
+      "source": "Bodinho Yaoi",
+      "query": "release",
+      "title": "Release Your Persona",
+      "url": "https://bodinhoyaoi.com/obras/release-your-persona",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": 19,
+      "chapters_raw": 19,
+      "chapters_parsed": 19,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "Bodinho Yaoi",
+      "query": "jinx",
+      "title": "Jinx",
+      "url": "https://bodinhoyaoi.com/obras/jinx",
+      "search_raw": 2,
+      "search_parsed": 2,
+      "chapters_declared": 108,
+      "chapters_raw": 108,
+      "chapters_parsed": 108,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "Bodinho Yaoi",
+      "query": "low tide",
+      "title": "Low Tide In Twilight",
+      "url": "https://bodinhoyaoi.com/obras/low-tide-in-twilight",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": 118,
+      "chapters_raw": 118,
+      "chapters_parsed": 118,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "BR Yaoi",
+      "query": "release",
+      "title": "Release Your Persona",
+      "url": "https://bryaoi.com/yaoi/release-your-persona-online/",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": 0,
+      "chapters_raw": 2,
+      "chapters_parsed": 2,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "FAIL",
+      "notes": [
+        "A página declara 0 capítulos, mas `.capitulos a` encontra 2."
+      ]
+    },
+    {
+      "source": "BR Yaoi",
+      "query": "jinx",
+      "title": "Jinx",
+      "url": "https://bryaoi.com/yaoi/jinx-online/",
+      "search_raw": 2,
+      "search_parsed": 2,
+      "chapters_declared": 1,
+      "chapters_raw": 109,
+      "chapters_parsed": 109,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "FAIL",
+      "notes": [
+        "A página declara 1 capítulos, mas `.capitulos a` encontra 109."
+      ]
+    },
+    {
+      "source": "ManhwaZone",
+      "query": "jinx",
+      "title": "Jinx",
+      "url": "https://manhwazone.com/series/jinx-p22r2",
+      "search_raw": 2,
+      "search_parsed": 2,
+      "chapters_declared": 84,
+      "chapters_raw": 100,
+      "chapters_parsed": 100,
+      "duplicate_chapters": 0,
+      "pagination_detected": null,
+      "status": "FAIL",
+      "notes": [
+        "A página declara 84 capítulos; Livewire entregou 100 indexáveis."
+      ]
+    },
+    {
+      "source": "ManhwaZone",
+      "query": "low tide",
+      "title": "Low Tide in Twilight",
+      "url": "https://manhwazone.com/series/low-tide-in-twilight-z460x",
+      "search_raw": 4,
+      "search_parsed": 4,
+      "chapters_declared": 69,
+      "chapters_raw": 108,
+      "chapters_parsed": 108,
+      "duplicate_chapters": 0,
+      "pagination_detected": null,
+      "status": "FAIL",
+      "notes": [
+        "A página declara 69 capítulos; Livewire entregou 108 indexáveis."
+      ]
+    },
+    {
+      "source": "Mangago",
+      "query": "jinx",
+      "title": "The Jinx's Lover",
+      "url": "https://www.mangago.me/read-manga/the_jinxs_lover/",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": 96,
+      "chapters_raw": 96,
+      "chapters_parsed": 96,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "Mangago",
+      "query": "low tide",
+      "title": "The Blue Flows",
+      "url": "https://www.mangago.me/read-manga/the_blue_flows/",
+      "search_raw": 1,
+      "search_parsed": 1,
+      "chapters_declared": 85,
+      "chapters_raw": 85,
+      "chapters_parsed": 85,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "MangaK",
+      "query": "jinx",
+      "title": "Jinx",
+      "url": "https://mangak.io/jinx",
+      "search_raw": 24,
+      "search_parsed": 24,
+      "chapters_declared": null,
+      "chapters_raw": 198,
+      "chapters_parsed": 198,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    },
+    {
+      "source": "MangaK",
+      "query": "low tide",
+      "title": "Night by the sea",
+      "url": "https://mangak.io/night-by-the-sea",
+      "search_raw": 24,
+      "search_parsed": 24,
+      "chapters_declared": null,
+      "chapters_raw": 176,
+      "chapters_parsed": 176,
+      "duplicate_chapters": 0,
+      "pagination_detected": false,
+      "status": "PASS",
+      "notes": null
+    }
+  ]
+}
