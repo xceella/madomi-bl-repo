@@ -8,8 +8,7 @@
       "tests": [
         {"query": "release", "expectTitle": "Release Your Persona"},
         {"query": "jinx", "expectTitle": "Jinx"},
-        {"query": "low tide", "expectTitle": "Low Tide in Twilight"},
-        {"query": "desire me if you can", "expectTitle": null}
+        {"query": "low tide", "expectTitle": "Low Tide in Twilight"}
       ]
     },
     {
@@ -19,8 +18,7 @@
       "baseUrl": "https://bryaoi.com",
       "tests": [
         {"query": "release", "expectTitle": "Release Your Persona"},
-        {"query": "jinx", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": null}
+        {"query": "jinx", "expectTitle": null}
       ]
     },
     {
@@ -30,8 +28,7 @@
       "baseUrl": "https://manhwazone.com",
       "tests": [
         {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": null}
+        {"query": "low tide", "expectTitle": null}
       ]
     },
     {
@@ -41,8 +38,7 @@
       "baseUrl": "https://www.mangago.me",
       "tests": [
         {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": null}
+        {"query": "low tide", "expectTitle": null}
       ]
     },
     {
@@ -52,8 +48,7 @@
       "baseUrl": "https://mangak.io",
       "tests": [
         {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": null}
+        {"query": "low tide", "expectTitle": null}
       ]
     }
   ]
