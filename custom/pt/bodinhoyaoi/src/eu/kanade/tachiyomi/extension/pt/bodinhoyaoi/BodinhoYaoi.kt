@@ -10,7 +10,6 @@ import keiyoushi.annotation.Source
 import keiyoushi.network.get
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
-import keiyoushi.utils.parseAs
 import keiyoushi.utils.runWebView
 import kotlinx.coroutines.CancellationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
