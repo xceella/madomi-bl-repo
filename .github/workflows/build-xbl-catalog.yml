@@ -1,4 +1,4 @@
-name: Build XBL root catalog
+name: Build XBL Mihon PT-BR catalog
 
 on:
   workflow_dispatch:
@@ -99,6 +99,10 @@ jobs:
       - name: Validar catálogo configurado
         run: |
           COUNT=$(jq 'length' catalog/sources.json)
+          if ! jq -e 'all(.[]; (.module | startswith("src/pt/")) and (.slug | length > 0))' catalog/sources.json >/dev/null; then
+            echo "::error::O catálogo Mihon XBL só pode conter módulos PT-BR (src/pt/)."
+            exit 1
+          fi
           if [ "$COUNT" -lt 1 ]; then
             echo "::error::O catálogo está vazio."
             exit 1
@@ -181,6 +185,11 @@ jobs:
               exit 1
             fi
 
+            if ! jq -e '(.sources | length > 0) and (.sources | all(.[]; .lang == "pt-BR"))' "$INFO" >/dev/null; then
+              echo "::error::A extensão ${SLUG} declarou idioma diferente de pt-BR."
+              exit 1
+            fi
+
             VERSION=$(jq -r '.versionName' "$INFO")
             NAME=$(jq -r '.name' "$INFO")
             TAG="xbl-${SLUG}-v${VERSION}"
@@ -196,7 +205,7 @@ jobs:
                 NOTES="Build compilada e assinada pelo Xceella BL Repo. Código-base: keiyoushi/extensions-source (Apache-2.0)."
               fi
               gh release create "$TAG" "$APK" "$JAR" \
-                --title "${NAME} ${VERSION} — Xceella BL" \
+                --title "${NAME} ${VERSION} — XBL Mihon PT-BR" \
                 --notes "$NOTES"
             fi
 
@@ -216,12 +225,16 @@ jobs:
               --fingerprint "$FINGERPRINT" \
               --output-dir generated-root \
               --index-url "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/index.pb" \
-              --name "Xceella BL Repo" \
+              --name "XBL — Mihon PT-BR" \
               --badge-label "XBL"
           done < <(jq -c '.[]' catalog/sources.json)
 
       - name: Validar catálogo final
         run: |
+          if ! jq -e '(.extensionList.extensions | all(.sources[]; .language == "pt-BR"))' generated-root/index.json >/dev/null; then
+            echo "::error::Catálogo gerado contém fontes não PT-BR."
+            exit 1
+          fi
           COUNT=$(jq '.extensionList.extensions | length' generated-root/index.json)
           if [ "$COUNT" -ne "$EXPECTED_COUNT" ]; then
             echo "::error::O catálogo final deveria conter $EXPECTED_COUNT extensões, mas contém $COUNT."
