@@ -231,7 +231,7 @@ jobs:
 
       - name: Validar catálogo final
         run: |
-          if ! jq -e '(.extensionList.extensions | all(.sources[]; .language == "pt-BR"))' generated-root/index.json >/dev/null; then
+          if ! jq -e '(.extensionList.extensions | all(.[]; (.sources | length > 0) and (.sources | all(.[]; .language == "pt-BR"))))' generated-root/index.json >/dev/null; then
             echo "::error::Catálogo gerado contém fontes não PT-BR."
             exit 1
           fi
