@@ -18,7 +18,8 @@
   {
     "slug": "xxxyaoi",
     "module": "src/pt/xxxyaoi",
-    "custom": "custom/pt/xxxyaoi"
+    "custom": "custom/pt/xxxyaoi",
+    "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/xxxyaoi/res/mipmap-xhdpi/ic_launcher.png"
   },
   {
     "slug": "bodinhoyaoi",
