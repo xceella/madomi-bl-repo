@@ -17,7 +17,8 @@
   },
   {
     "slug": "xxxyaoi",
-    "module": "src/pt/xxxyaoi"
+    "module": "src/pt/xxxyaoi",
+    "custom": "custom/pt/xxxyaoi"
   },
   {
     "slug": "bodinhoyaoi",
