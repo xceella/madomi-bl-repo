@@ -15,9 +15,11 @@ import keiyoushi.utils.runWebView
 import kotlinx.coroutines.CancellationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
+import kotlin.time.Duration.Companion.seconds
 
 @Source
 abstract class BodinhoYaoi : KeiSource() {
@@ -214,59 +216,98 @@ abstract class BodinhoYaoi : KeiSource() {
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterUrl = getChapterUrl(chapter)
+        var httpDiagnostic = "requisição não concluída"
 
-        // Normal requests are faster and normally contain all reader images.
-        // Some chapter requests, however, return a shell without the image
-        // markup to Mihon even while the same chapter works in a browser.
+        // Most chapter responses include both img tags and Next.js flight data.
         val directPages = try {
-            extractChapterPages(client.get(chapterUrl).asJsoup(), chapterUrl)
+            val response = client.get(chapterUrl, ensureSuccess = false)
+            val html = response.body.string()
+            val document = Jsoup.parse(html, chapterUrl)
+            httpDiagnostic = "HTTP ${response.code}, título: ${document.title().take(64)}"
+            extractChapterPages(document, chapterUrl)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            httpDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(80).orEmpty()}"
             emptyList()
         }
         if (directPages.isNotEmpty()) return directPages
 
-        // Fall back to a real navigation so Next.js and browser cookies can
-        // populate the reader DOM. Don't download the giant images in WebView;
-        // Mihon fetches them separately using imageRequest().
+        // Next.js may hydrate after onPageFinished: poll instead of reading too early.
+        var browserDiagnostic = "não iniciado"
         val renderedHtml = try {
-            runWebView<String> {
+            runWebView<String>(22.seconds) {
                 userAgent = headers["User-Agent"].orEmpty()
                 blockImages = true
+                jsBridge("xblBodinhoHtml") { resolve(it) }
                 onPageFinished {
-                    evaluateJs("document.documentElement.outerHTML") { resolve(it.parseAs<String>()) }
+                    evaluateJs(
+                        """
+                        (function() {
+                          var attempts = 0;
+                          function checkReader() {
+                            var count = document.querySelectorAll(
+                              "img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']"
+                            ).length;
+                            if (count > 0 || attempts++ >= 24) {
+                              xblBodinhoHtml.post(document.documentElement.outerHTML);
+                            } else {
+                              setTimeout(checkReader, 400);
+                            }
+                          }
+                          checkReader();
+                        })();
+                        """.trimIndent(),
+                    )
                 }
                 loadUrl(chapterUrl)
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            throw IOException("Bodinho Yaoi: erro ao abrir o capítulo na WebView: ${e.message}", e)
+            browserDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(80).orEmpty()}"
+            null
         }
 
-        val pages = extractChapterPages(renderedHtml.asJsoup(chapterUrl), chapterUrl)
-        if (pages.isEmpty()) {
-            throw IOException("Bodinho Yaoi: nenhuma imagem encontrada no capítulo, mesmo após abrir no navegador interno.")
+        if (renderedHtml != null) {
+            val document = Jsoup.parse(renderedHtml, chapterUrl)
+            browserDiagnostic = "título: ${document.title().take(64)}, HTML: ${renderedHtml.length} caracteres"
+            val pages = extractChapterPages(document, chapterUrl)
+            if (pages.isNotEmpty()) return pages
         }
-        return pages
+
+        throw IOException(
+            "Bodinho v1.6.6: nenhuma imagem. Endereço: ${chapter.url.takeLast(70)}. Direto: $httpDiagnostic. WebView: $browserDiagnostic.",
+        )
     }
 
-    private fun extractChapterPages(document: Document, chapterUrl: String): List<Page> = document
-        .select("img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']")
-        .mapNotNull { image ->
-            listOf("data-src", "data-lazy-src", "src")
-                .asSequence()
-                .map { attribute -> image.attr("abs:$attribute") }
-                .firstOrNull { url ->
-                    (url.startsWith("https://") || url.startsWith("http://")) && url.contains("/chapters/")
-                }
-        }
-        .distinct()
-        .mapIndexed { index, url -> Page(index, chapterUrl, url) }
+    private fun extractChapterPages(document: Document, chapterUrl: String): List<Page> {
+        val imageUrls = document
+            .select("img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']")
+            .mapNotNull { image ->
+                listOf("data-src", "data-lazy-src", "src")
+                    .asSequence()
+                    .map { attribute -> image.attr("abs:$attribute") }
+                    .firstOrNull { url ->
+                        url.startsWith("https://") && url.contains("media.bodinhoyaoi.com/") && url.contains("/chapters/")
+                    }
+            }
+            .distinct()
 
-    // Media is hosted on a separate subdomain. Send the chapter origin as the
-    // browser does, so hotlink protection does not reject Mihon's image fetches.
+        // Next.js embeds the same URLs in streamed hydration scripts.
+        val urls = if (imageUrls.isNotEmpty()) {
+            imageUrls
+        } else {
+            val flightHtml = document.html().replace("\\/", "/")
+            Regex("""https://media\.bodinhoyaoi\.com/[a-zA-Z0-9_./%-]+/chapters/[a-zA-Z0-9_./%-]+\.(?:jpg|jpeg|png|webp)""")
+                .findAll(flightHtml)
+                .map { match -> match.value }
+                .distinct()
+                .toList()
+        }
+        return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
+    }
+
     override fun imageRequest(page: Page): Request = super.imageRequest(page).newBuilder()
         .header("Referer", page.url.ifBlank { "$baseUrl/" })
         .build()
