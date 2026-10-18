@@ -11,13 +11,13 @@
         "name": "Bodinho Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.bodinhoyaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.4/tachiyomi-pt.bodinhoyaoi-v1.6.4.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.5/tachiyomi-pt.bodinhoyaoi-v1.6.5.apk",
           "iconUrl": "https://bodinhoyaoi.com/logo-256.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.4/tachiyomi-pt.bodinhoyaoi-v1.6.4.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.5/tachiyomi-pt.bodinhoyaoi-v1.6.5.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106004",
-        "versionName": "1.6.4",
+        "versionCode": "106005",
+        "versionName": "1.6.5",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
