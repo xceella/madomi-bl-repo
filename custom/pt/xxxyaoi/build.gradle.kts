@@ -7,7 +7,7 @@ plugins {
 keiyoushi {
     name = "XXX Yaoi"
     // Custom XBL fix for the current chapter-list layout, based on Keiyoushi XXXYaoi.
-    versionCode = 6
+    versionCode = 7
     contentWarning = ContentWarning.NSFW
     libVersion = "1.6"
     theme = "madara"
