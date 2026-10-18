@@ -48,21 +48,20 @@ abstract class XXXYaoi : MadaraNoAjax() {
 
     override val archiveUrlSelector = "h3 > a"
 
-    override fun chapterFromElement(element: Element, mangaPath: String) =
-        super.chapterFromElement(element, mangaPath)?.apply {
-            // Use stable site container classes, not the generated c_XXXXXXXX names.
-            // Never force a nullable selector: a single failed chapter must not crash all details.
-            name = element.selectFirst(
-                ".xyaoi-chapter-left > div:not(.xyaoi-chapter-thumb-wrapper) > div:first-child > span:first-child",
-            )?.text()?.trim()?.takeIf(String::isNotBlank) ?: name
+    override fun chapterFromElement(element: Element, mangaPath: String) = super.chapterFromElement(element, mangaPath)?.apply {
+        // Use stable site container classes, not the generated c_XXXXXXXX names.
+        // Never force a nullable selector: a single failed chapter must not crash all details.
+        name = element.selectFirst(
+            ".xyaoi-chapter-left > div:not(.xyaoi-chapter-thumb-wrapper) > div:first-child > span:first-child",
+        )?.text()?.trim()?.takeIf(String::isNotBlank) ?: name
 
-            val dateText = element.selectFirst(
-                ".xyaoi-chapter-left > div:not(.xyaoi-chapter-thumb-wrapper) > div:last-child > span:last-child",
-            )?.text()?.trim()?.takeIf(String::isNotBlank)
-            if (dateText != null) {
-                date_upload = parseChapterDate(dateText)
-            }
+        val dateText = element.selectFirst(
+            ".xyaoi-chapter-left > div:not(.xyaoi-chapter-thumb-wrapper) > div:last-child > span:last-child",
+        )?.text()?.trim()?.takeIf(String::isNotBlank)
+        if (dateText != null) {
+            date_upload = parseChapterDate(dateText)
         }
+    }
 
     override suspend fun fetchChapterDocument(chapterUrl: String): Document {
         // The current site renders page-break / img elements in the initial HTML.
