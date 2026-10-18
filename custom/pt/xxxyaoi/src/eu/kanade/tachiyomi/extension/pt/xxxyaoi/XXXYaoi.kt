@@ -117,3 +117,4 @@ abstract class XXXYaoi : MadaraNoAjax() {
         }
         .distinct()
         .mapIndexed { index, url -> Page(index, chapterUrl, url) }
+}
