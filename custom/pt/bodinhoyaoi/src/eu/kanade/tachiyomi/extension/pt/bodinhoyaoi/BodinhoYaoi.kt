@@ -10,9 +10,14 @@ import keiyoushi.annotation.Source
 import keiyoushi.network.get
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
+import keiyoushi.utils.parseAs
+import keiyoushi.utils.runWebView
+import kotlinx.coroutines.CancellationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Request
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.io.IOException
 
 @Source
 abstract class BodinhoYaoi : KeiSource() {
@@ -208,12 +213,61 @@ abstract class BodinhoYaoi : KeiSource() {
         }
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
-        val document = client.get(getChapterUrl(chapter)).asJsoup()
-        return document
-            .select("img[src*='media.bodinhoyaoi.com'][src*='/chapters/']")
-            .distinctBy { it.attr("src") }
-            .mapIndexed { index, element ->
-                Page(index, imageUrl = element.attr("abs:src"))
+        val chapterUrl = getChapterUrl(chapter)
+
+        // Normal requests are faster and normally contain all reader images.
+        // Some chapter requests, however, return a shell without the image
+        // markup to Mihon even while the same chapter works in a browser.
+        val directPages = try {
+            extractChapterPages(client.get(chapterUrl).asJsoup(), chapterUrl)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emptyList()
+        }
+        if (directPages.isNotEmpty()) return directPages
+
+        // Fall back to a real navigation so Next.js and browser cookies can
+        // populate the reader DOM. Don't download the giant images in WebView;
+        // Mihon fetches them separately using imageRequest().
+        val renderedHtml = try {
+            runWebView<String> {
+                userAgent = headers["User-Agent"].orEmpty()
+                blockImages = true
+                onPageFinished {
+                    evaluateJs("document.documentElement.outerHTML") { resolve(it.parseAs<String>()) }
+                }
+                loadUrl(chapterUrl)
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw IOException("Bodinho Yaoi: erro ao abrir o capítulo na WebView: ${e.message}", e)
+        }
+
+        val pages = extractChapterPages(renderedHtml.asJsoup(chapterUrl), chapterUrl)
+        if (pages.isEmpty()) {
+            throw IOException("Bodinho Yaoi: nenhuma imagem encontrada no capítulo, mesmo após abrir no navegador interno.")
+        }
+        return pages
     }
+
+    private fun extractChapterPages(document: Document, chapterUrl: String): List<Page> = document
+        .select("img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']")
+        .mapNotNull { image ->
+            listOf("data-src", "data-lazy-src", "src")
+                .asSequence()
+                .map { attribute -> image.attr("abs:$attribute") }
+                .firstOrNull { url ->
+                    (url.startsWith("https://") || url.startsWith("http://")) && url.contains("/chapters/")
+                }
+        }
+        .distinct()
+        .mapIndexed { index, url -> Page(index, chapterUrl, url) }
+
+    // Media is hosted on a separate subdomain. Send the chapter origin as the
+    // browser does, so hotlink protection does not reject Mihon's image fetches.
+    override fun imageRequest(page: Page): Request = super.imageRequest(page).newBuilder()
+        .header("Referer", page.url.ifBlank { "$baseUrl/" })
+        .build()
 }
