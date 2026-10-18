@@ -222,12 +222,12 @@ abstract class BodinhoYaoi : KeiSource() {
             val response = client.get(chapterUrl, ensureSuccess = false)
             val html = response.body.string()
             val document = Jsoup.parse(html, chapterUrl)
-            httpDiagnostic = "HTTP ${response.code}, título: ${document.title().take(64)}"
+            httpDiagnostic = "HTTP${response.code}/${html.length}, ${document.title().take(24)}"
             extractChapterPages(document, chapterUrl)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            httpDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(80).orEmpty()}"
+            httpDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(28).orEmpty()}"
             emptyList()
         }
         if (directPages.isNotEmpty()) return directPages
@@ -264,19 +264,19 @@ abstract class BodinhoYaoi : KeiSource() {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            browserDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(80).orEmpty()}"
+            browserDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(28).orEmpty()}"
             null
         }
 
         if (renderedHtml != null) {
             val document = Jsoup.parse(renderedHtml, chapterUrl)
-            browserDiagnostic = "título: ${document.title().take(64)}, HTML: ${renderedHtml.length} caracteres"
+            browserDiagnostic = "${document.title().take(24)}/${renderedHtml.length}"
             val pages = extractChapterPages(document, chapterUrl)
             if (pages.isNotEmpty()) return pages
         }
 
         throw IOException(
-            "Bodinho v1.6.6: nenhuma imagem. Endereço: ${chapter.url.takeLast(70)}. Direto: $httpDiagnostic. WebView: $browserDiagnostic.",
+            "Bodinho v1.6.7: direto=$httpDiagnostic; web=$browserDiagnostic; sem imagens.",
         )
     }
 
