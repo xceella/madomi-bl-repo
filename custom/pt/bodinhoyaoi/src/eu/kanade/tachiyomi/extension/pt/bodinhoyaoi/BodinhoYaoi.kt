@@ -222,7 +222,7 @@ abstract class BodinhoYaoi : KeiSource() {
             val response = client.get(chapterUrl, ensureSuccess = false)
             val html = response.body.string()
             val document = Jsoup.parse(html, chapterUrl)
-            httpDiagnostic = "HTTP${response.code}/${html.length}, ${document.title().take(24)}"
+            httpDiagnostic = "HTTP${response.code}/${html.length}, imgs=${document.select("img").size}, ref=${html.contains("/chapters/")}"
             extractChapterPages(document, chapterUrl)
         } catch (e: CancellationException) {
             throw e
@@ -270,40 +270,38 @@ abstract class BodinhoYaoi : KeiSource() {
 
         if (renderedHtml != null) {
             val document = Jsoup.parse(renderedHtml, chapterUrl)
-            browserDiagnostic = "${document.title().take(24)}/${renderedHtml.length}"
+            browserDiagnostic = "html=${renderedHtml.length}, imgs=${document.select("img").size}, ref=${renderedHtml.contains("/chapters/")}"
             val pages = extractChapterPages(document, chapterUrl)
             if (pages.isNotEmpty()) return pages
         }
 
         throw IOException(
-            "Bodinho v1.6.7: direto=$httpDiagnostic; web=$browserDiagnostic; sem imagens.",
+            "Bodinho v1.6.8: direto=$httpDiagnostic; web=$browserDiagnostic; sem imagens.",
         )
     }
 
     private fun extractChapterPages(document: Document, chapterUrl: String): List<Page> {
-        val imageUrls = document
-            .select("img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']")
-            .mapNotNull { image ->
-                listOf("data-src", "data-lazy-src", "src")
-                    .asSequence()
-                    .map { attribute -> image.attr("abs:$attribute") }
-                    .firstOrNull { url ->
-                        url.startsWith("https://") && url.contains("media.bodinhoyaoi.com/") && url.contains("/chapters/")
-                    }
-            }
-            .distinct()
+        // Include preload links, Next.js hydration data and normal <img> elements.
+        // Some requests return URLs escaped as \u002F or \/ instead of literal slashes.
+        val normalizedHtml = document.html()
+            .replace("\\u002F", "/")
+            .replace("\\u002f", "/")
+            .replace("\\/", "/")
+            .replace("\\\"", "\"")
+            .replace("&#x2F;", "/")
+            .replace("&quot;", "\"")
 
-        // Next.js embeds the same URLs in streamed hydration scripts.
-        val urls = if (imageUrls.isNotEmpty()) {
-            imageUrls
-        } else {
-            val flightHtml = document.html().replace("\\/", "/")
-            Regex("""https://media\.bodinhoyaoi\.com/[a-zA-Z0-9_./%-]+/chapters/[a-zA-Z0-9_./%-]+\.(?:jpg|jpeg|png|webp)""")
-                .findAll(flightHtml)
-                .map { match -> match.value }
-                .distinct()
-                .toList()
-        }
+        val chapterImagePattern = Regex(
+            """https?://media\.bodinhoyaoi\.com/[^"'<>\\\s]+?\.(?:jpe?g|png|webp|avif)(?:\?[^"'<>\s\\]*)?""",
+            RegexOption.IGNORE_CASE,
+        )
+
+        val urls = chapterImagePattern.findAll(normalizedHtml)
+            .map { it.value }
+            .filter { it.contains("/chapters/", ignoreCase = true) }
+            .distinct()
+            .toList()
+
         return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
     }
 
