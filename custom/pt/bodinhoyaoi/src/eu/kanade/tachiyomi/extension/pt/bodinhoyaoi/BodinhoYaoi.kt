@@ -13,6 +13,10 @@ import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
 import keiyoushi.utils.runWebView
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -290,7 +294,7 @@ abstract class BodinhoYaoi : KeiSource() {
         }
 
         throw IOException(
-            "Bodinho v1.6.9: direto=$httpDiagnostic; CDN=0; web=$browserDiagnostic; sem imagens.",
+            "Bodinho v1.6.10: direto=$httpDiagnostic; CDN=0; web=$browserDiagnostic; sem imagens.",
         )
     }
 
@@ -320,9 +324,10 @@ abstract class BodinhoYaoi : KeiSource() {
     }
 
     /**
-     * Media fallback for Next.js reader pages served without their images.
-     * Chapter numbers include decimals (e.g. 2009.1 for a side story).
-     * Stop at the first missing filename because pages are sequential.
+     * Fast CDN fallback for reader HTML missing the chapter image URLs.
+     * Probe four page numbers concurrently instead of waiting sequentially for
+     * every jpg/webp HEAD response. Never download the actual image here.
+     * Preserve contiguous ordering and stop at the first missing page.
      */
     private suspend fun discoverMediaPages(chapter: SChapter, chapterUrl: String): List<Page> {
         val bookSlug = chapter.url.substringAfter("/obras/", "").substringBefore('/')
@@ -334,38 +339,51 @@ abstract class BodinhoYaoi : KeiSource() {
 
         val mediaHeaders = headers.newBuilder().set("Referer", chapterUrl).build()
         val results = mutableListOf<Page>()
-        var preferredExtension: String? = null
 
-        for (pageNumber in 1..80) {
+        suspend fun probePage(pageNumber: Int): String? {
             val filename = pageNumber.toString().padStart(4, '0')
-            val extensions = (listOfNotNull(preferredExtension) + listOf("jpg", "webp", "png", "jpeg", "avif")).distinct()
-            var foundUrl: String? = null
+            val prefix = "https://media.bodinhoyaoi.com/$bookSlug/chapters/$chapterSlug/$filename"
 
-            for (extension in extensions) {
-                val candidate = "https://media.bodinhoyaoi.com/$bookSlug/chapters/$chapterSlug/$filename.$extension"
-                val exists = try {
-                    client.head(candidate, mediaHeaders, ensureSuccess = false).use { response ->
-                        response.isSuccessful && response.header("Content-Type").orEmpty().startsWith("image/")
-                    }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    false
+            suspend fun isImage(extension: String): Boolean = try {
+                client.head("$prefix.$extension", mediaHeaders, ensureSuccess = false).use { response ->
+                    response.isSuccessful && response.header("Content-Type").orEmpty().startsWith("image/", ignoreCase = true)
                 }
-
-                if (exists) {
-                    foundUrl = candidate
-                    preferredExtension = extension
-                    break
-                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                false
             }
 
-            // Missing filenames mean the chapter is complete. The first page
-            // must exist; otherwise return empty so other recovery paths run.
-            if (foundUrl == null) break
-            results.add(Page(results.size, chapterUrl, foundUrl))
+            // Both formats occur within the same chapter, so test them in parallel.
+            val primary = coroutineScope {
+                listOf("jpg", "webp").map { extension ->
+                    async(Dispatchers.IO) { extension to isImage(extension) }
+                }.awaitAll().firstOrNull { (_, exists) -> exists }?.first
+            }
+            if (primary != null) return "$prefix.$primary"
+
+            // Less common extensions, also concurrently, only if both above fail.
+            val secondary = coroutineScope {
+                listOf("png", "jpeg", "avif").map { extension ->
+                    async(Dispatchers.IO) { extension to isImage(extension) }
+                }.awaitAll().firstOrNull { (_, exists) -> exists }?.first
+            }
+            return secondary?.let { "$prefix.$it" }
         }
 
+        // Four pages per batch bounds concurrent HEAD requests and avoids
+        // probing the entire chapter before discovering its end.
+        for (start in 1..80 step 4) {
+            val batch = coroutineScope {
+                (start..minOf(start + 3, 80)).map { pageNumber ->
+                    async(Dispatchers.IO) { probePage(pageNumber) }
+                }.awaitAll()
+            }
+            for (url in batch) {
+                if (url == null) return results
+                results.add(Page(results.size, chapterUrl, url))
+            }
+        }
         return results
     }
 
