@@ -1,6 +1,6 @@
 # XBL Source Audit
 
-Gerado em **2026-10-16T01:46:05+00:00**.
+Gerado em **2026-10-19T16:03:05+00:00**.
 
 Esta auditoria procura obras que a busca pode descartar, capítulos que o parser pode deixar de indexar, duplicatas e sinais de paginação não percorrida.
 
@@ -20,7 +20,7 @@ Esta auditoria procura obras que a busca pode descartar, capítulos que o parser
 | Mangago | `desire me if you can` | Tell Me You Can Hear It | 1 / 1 | 32 / 32 / 32 | **PASS** |
 | MangaK | `jinx` | Jinx | 24 / 24 | - / 198 / 198 | **PASS** |
 | MangaK | `low tide` | Night by the sea | 24 / 24 | - / 176 / 176 | **PASS** |
-| MangaK | `desire me if you can` | Desire Me if You Can | 24 / 24 | - / 35 / 35 | **PASS** |
+| MangaK | `desire me if you can` | Desire Me if You Can | 24 / 24 | - / 36 / 36 | **PASS** |
 
 ## Achados
 

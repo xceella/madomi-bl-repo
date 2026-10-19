@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T01:46:05+00:00",
+  "generatedAt": "2026-10-19T16:03:05+00:00",
   "checks": [
     {
       "source": "Bodinho Yaoi",
@@ -219,8 +219,8 @@
       "search_raw": 24,
       "search_parsed": 24,
       "chapters_declared": null,
-      "chapters_raw": 35,
-      "chapters_parsed": 35,
+      "chapters_raw": 36,
+      "chapters_parsed": 36,
       "duplicate_chapters": 0,
       "pagination_detected": false,
       "status": "PASS",
