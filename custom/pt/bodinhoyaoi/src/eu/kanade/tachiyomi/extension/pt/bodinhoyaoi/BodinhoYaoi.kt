@@ -8,6 +8,7 @@ import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import keiyoushi.annotation.Source
 import keiyoushi.network.get
+import keiyoushi.network.head
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
 import keiyoushi.utils.runWebView
@@ -232,6 +233,19 @@ abstract class BodinhoYaoi : KeiSource() {
         }
         if (directPages.isNotEmpty()) return directPages
 
+        // The Bodinho CDN stores its chapter images using consecutive 4-digit
+        // filenames in jpg/webp. When the server responds with a partial
+        // chapter HTML (HTTP 200 but no /chapters/), probe these URLs directly.
+        // HEAD avoids downloading the oversized vertical images twice.
+        val mediaPages = try {
+            discoverMediaPages(chapter, chapterUrl)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emptyList()
+        }
+        if (mediaPages.isNotEmpty()) return mediaPages
+
         // Next.js may hydrate after onPageFinished: poll instead of reading too early.
         var browserDiagnostic = "não iniciado"
         val renderedHtml = try {
@@ -276,7 +290,7 @@ abstract class BodinhoYaoi : KeiSource() {
         }
 
         throw IOException(
-            "Bodinho v1.6.8: direto=$httpDiagnostic; web=$browserDiagnostic; sem imagens.",
+            "Bodinho v1.6.9: direto=$httpDiagnostic; CDN=0; web=$browserDiagnostic; sem imagens.",
         )
     }
 
@@ -303,6 +317,56 @@ abstract class BodinhoYaoi : KeiSource() {
             .toList()
 
         return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
+    }
+
+    /**
+     * Media fallback for Next.js reader pages served without their images.
+     * Chapter numbers include decimals (e.g. 2009.1 for a side story).
+     * Stop at the first missing filename because pages are sequential.
+     */
+    private suspend fun discoverMediaPages(chapter: SChapter, chapterUrl: String): List<Page> {
+        val bookSlug = chapter.url.substringAfter("/obras/", "").substringBefore('/')
+        val chapterSlug = chapter.url.substringAfter("/capitulo/", "").substringBefore('/').substringBefore('?')
+
+        if (!bookSlug.matches(Regex("[a-z0-9-]+")) || !chapterSlug.matches(Regex("[0-9]+(?:\\.[0-9]+)?"))) {
+            return emptyList()
+        }
+
+        val mediaHeaders = headers.newBuilder().set("Referer", chapterUrl).build()
+        val results = mutableListOf<Page>()
+        var preferredExtension: String? = null
+
+        for (pageNumber in 1..80) {
+            val filename = pageNumber.toString().padStart(4, '0')
+            val extensions = (listOfNotNull(preferredExtension) + listOf("jpg", "webp", "png", "jpeg", "avif")).distinct()
+            var foundUrl: String? = null
+
+            for (extension in extensions) {
+                val candidate = "https://media.bodinhoyaoi.com/$bookSlug/chapters/$chapterSlug/$filename.$extension"
+                val exists = try {
+                    client.head(candidate, mediaHeaders, ensureSuccess = false).use { response ->
+                        response.isSuccessful && response.header("Content-Type").orEmpty().startsWith("image/")
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    false
+                }
+
+                if (exists) {
+                    foundUrl = candidate
+                    preferredExtension = extension
+                    break
+                }
+            }
+
+            // Missing filenames mean the chapter is complete. The first page
+            // must exist; otherwise return empty so other recovery paths run.
+            if (foundUrl == null) break
+            results.add(Page(results.size, chapterUrl, foundUrl))
+        }
+
+        return results
     }
 
     override fun imageRequest(page: Page): Request = super.imageRequest(page).newBuilder()
