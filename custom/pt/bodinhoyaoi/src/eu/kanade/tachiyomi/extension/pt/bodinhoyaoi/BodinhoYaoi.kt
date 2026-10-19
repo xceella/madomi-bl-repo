@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.selects.select
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -221,11 +222,22 @@ abstract class BodinhoYaoi : KeiSource() {
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterUrl = getChapterUrl(chapter)
         var httpDiagnostic = "requisição não concluída"
+        var initialHtml: String? = null
 
-        // Most chapter responses include both img tags and Next.js flight data.
+        // Match the browser-style document headers from our working XXX Yaoi source.
+        val pageHeaders = headers.newBuilder()
+            .set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .set("Upgrade-Insecure-Requests", "1")
+            .set("Sec-Fetch-Site", "none")
+            .set("Sec-Fetch-Mode", "navigate")
+            .set("Sec-Fetch-Dest", "document")
+            .set("Sec-Fetch-User", "?1")
+            .build()
+
         val directPages = try {
-            val response = client.get(chapterUrl, ensureSuccess = false)
+            val response = client.get(chapterUrl, pageHeaders, ensureSuccess = false)
             val html = response.body.string()
+            initialHtml = html
             val document = Jsoup.parse(html, chapterUrl)
             httpDiagnostic = "HTTP${response.code}/${html.length}, imgs=${document.select("img").size}, ref=${html.contains("/chapters/")}"
             extractChapterPages(document, chapterUrl)
@@ -237,65 +249,90 @@ abstract class BodinhoYaoi : KeiSource() {
         }
         if (directPages.isNotEmpty()) return directPages
 
-        // The Bodinho CDN stores its chapter images using consecutive 4-digit
-        // filenames in jpg/webp. When the server responds with a partial
-        // chapter HTML (HTTP 200 but no /chapters/), probe these URLs directly.
-        // HEAD avoids downloading the oversized vertical images twice.
-        val mediaPages = try {
-            discoverMediaPages(chapter, chapterUrl)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            emptyList()
-        }
-        if (mediaPages.isNotEmpty()) return mediaPages
-
-        // Next.js may hydrate after onPageFinished: poll instead of reading too early.
+        // Adapt the XXX Yaoi technique: render the already-fetched document.
+        // Next.js scripts remain available; image downloads are blocked.
+        // Concurrent fallback avoids adding WebView timeout to CDN probing.
         var browserDiagnostic = "não iniciado"
-        val renderedHtml = try {
-            runWebView<String>(22.seconds) {
-                userAgent = headers["User-Agent"].orEmpty()
-                blockImages = true
-                jsBridge("xblBodinhoHtml") { resolve(it) }
-                onPageFinished {
-                    evaluateJs(
-                        """
-                        (function() {
-                          var attempts = 0;
-                          function checkReader() {
-                            var count = document.querySelectorAll(
-                              "img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']"
-                            ).length;
-                            if (count > 0 || attempts++ >= 24) {
-                              xblBodinhoHtml.post(document.documentElement.outerHTML);
-                            } else {
-                              setTimeout(checkReader, 400);
-                            }
-                          }
-                          checkReader();
-                        })();
-                        """.trimIndent(),
+        var cdnDiagnostic = "não iniciado"
+
+        return coroutineScope {
+            val browserTask = async {
+                try {
+                    val rendered = runWebView<String>(7.seconds) {
+                        userAgent = headers["User-Agent"].orEmpty()
+                        blockImages = true
+                        jsBridge("xblBodinhoHtml") { resolve(it) }
+                        onPageFinished {
+                            evaluateJs(
+                                """
+                                (function() {
+                                  if (window.__xblReaderProbeInstalled) return;
+                                  window.__xblReaderProbeInstalled = true;
+                                  var attempts = 0;
+                                  function extract() {
+                                    var images = document.querySelectorAll(
+                                      "img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']"
+                                    );
+                                    if (images.length > 0 || ++attempts >= 12) {
+                                      xblBodinhoHtml.post(document.documentElement.outerHTML);
+                                    } else {
+                                      setTimeout(extract, 250);
+                                    }
+                                  }
+                                  extract();
+                                })();
+                                """.trimIndent(),
+                            )
+                        }
+                        if (initialHtml != null) {
+                            loadData(chapterUrl, initialHtml!!)
+                        } else {
+                            loadUrl(chapterUrl)
+                        }
+                    }
+                    val document = Jsoup.parse(rendered, chapterUrl)
+                    val pages = extractChapterPages(document, chapterUrl)
+                    browserDiagnostic = "html=${rendered.length}, imgs=${document.select("img").size}, pages=${pages.size}"
+                    pages
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    browserDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(28).orEmpty()}"
+                    emptyList()
+                }
+            }
+
+            val cdnTask = async(Dispatchers.IO) {
+                try {
+                    discoverMediaPages(chapter, chapterUrl).also {
+                        cdnDiagnostic = "pages=${it.size}"
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    cdnDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(28).orEmpty()}"
+                    emptyList()
+                }
+            }
+
+            val first = select<Pair<Boolean, List<Page>>> {
+                browserTask.onAwait { true to it }
+                cdnTask.onAwait { false to it }
+            }
+            if (first.second.isNotEmpty()) {
+                if (first.first) cdnTask.cancel() else browserTask.cancel()
+                first.second
+            } else {
+                val remaining = if (first.first) cdnTask.await() else browserTask.await()
+                if (remaining.isNotEmpty()) {
+                    remaining
+                } else {
+                    throw IOException(
+                        "Bodinho v1.6.11: direto=${httpDiagnostic}; CDN=${cdnDiagnostic}; web=${browserDiagnostic}; sem imagens.",
                     )
                 }
-                loadUrl(chapterUrl)
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            browserDiagnostic = "${e.javaClass.simpleName}: ${e.message?.take(28).orEmpty()}"
-            null
         }
-
-        if (renderedHtml != null) {
-            val document = Jsoup.parse(renderedHtml, chapterUrl)
-            browserDiagnostic = "html=${renderedHtml.length}, imgs=${document.select("img").size}, ref=${renderedHtml.contains("/chapters/")}"
-            val pages = extractChapterPages(document, chapterUrl)
-            if (pages.isNotEmpty()) return pages
-        }
-
-        throw IOException(
-            "Bodinho v1.6.10: direto=$httpDiagnostic; CDN=0; web=$browserDiagnostic; sem imagens.",
-        )
     }
 
     private fun extractChapterPages(document: Document, chapterUrl: String): List<Page> {
