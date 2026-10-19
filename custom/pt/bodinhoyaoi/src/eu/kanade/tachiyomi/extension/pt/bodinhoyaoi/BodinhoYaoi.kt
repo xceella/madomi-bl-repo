@@ -328,7 +328,7 @@ abstract class BodinhoYaoi : KeiSource() {
                     remaining
                 } else {
                     throw IOException(
-                        "Bodinho v1.6.11: direto=${httpDiagnostic}; CDN=${cdnDiagnostic}; web=${browserDiagnostic}; sem imagens.",
+                        "Bodinho v1.6.11: direto=$httpDiagnostic; CDN=$cdnDiagnostic; web=$browserDiagnostic; sem imagens.",
                     )
                 }
             }
