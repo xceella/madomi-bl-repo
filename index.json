@@ -137,13 +137,13 @@
         "name": "Portal Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.portalyaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.58/tachiyomi-pt.portalyaoi-v1.6.58.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.114/tachiyomi-pt.portalyaoi-v1.6.114.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/portalyaoi/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.58/tachiyomi-pt.portalyaoi-v1.6.58.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.114/tachiyomi-pt.portalyaoi-v1.6.114.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106058",
-        "versionName": "1.6.58",
+        "versionCode": "106114",
+        "versionName": "1.6.114",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
