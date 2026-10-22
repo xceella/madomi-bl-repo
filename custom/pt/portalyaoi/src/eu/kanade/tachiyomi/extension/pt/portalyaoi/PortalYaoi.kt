@@ -152,13 +152,16 @@ abstract class PortalYaoi : MadaraNoAjax() {
                 if (normalized.isNotBlank() &&
                     !title.lowercase().contains(normalized) &&
                     !fallbackName.lowercase().contains(normalized)
-                ) return@mapNotNull null
+                ) {
+                    return@mapNotNull null
+                }
 
                 SManga.create().apply {
                     setUrlWithoutDomain(href)
                     this.title = title
-                    thumbnail_url = img?.attr("abs:data-src")?.ifBlank { img.attr("abs:src") }
-                        ?.takeIf { it.startsWith("http") }
+                    thumbnail_url = img?.let { image ->
+                        image.attr("abs:data-src").ifBlank { image.attr("abs:src") }
+                    }?.takeIf { it.startsWith("http") }
                 }
             }
             .distinctBy { it.url }
