@@ -241,6 +241,15 @@ abstract class PortalYaoi : MadaraNoAjax() {
         return SMangaUpdate(updatedManga, updatedChapters)
     }
 
+    override fun getChapterUrl(chapter: SChapter): String {
+        val path = chapter.url
+        return when {
+            path.startsWith("https://") || path.startsWith("http://") -> path
+            path.startsWith("/manga/") -> "$baseUrl$path"
+            else -> super.getChapterUrl(chapter)
+        }
+    }
+
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterUrl = getChapterUrl(chapter)
         val response = client.get(chapterUrl, ensureSuccess = false)
