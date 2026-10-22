@@ -5,6 +5,10 @@ import eu.kanade.tachiyomi.multisrc.madara.MadaraNoAjax
 import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.source.model.MangasPage
 import eu.kanade.tachiyomi.source.model.SManga
+import okhttp3.Request
+import eu.kanade.tachiyomi.source.model.SMangaUpdate
+import eu.kanade.tachiyomi.source.model.SChapter
+import eu.kanade.tachiyomi.source.model.Page
 import keiyoushi.annotation.Source
 import keiyoushi.network.get
 import keiyoushi.network.rateLimit
@@ -166,6 +170,133 @@ abstract class PortalYaoi : MadaraNoAjax() {
             }
             .distinctBy { it.url }
     }
+
+
+    override suspend fun fetchMangaUpdate(
+        manga: SManga,
+        chapters: List<SChapter>,
+        fetchDetails: Boolean,
+        fetchChapters: Boolean,
+    ): SMangaUpdate {
+        val url = getMangaUrl(manga)
+        val response = client.get(url, ensureSuccess = false)
+        if (!response.isSuccessful) {
+            throw IOException("Portal Yaoi: HTTP ${response.code} nos detalhes da obra.")
+        }
+        val document = Jsoup.parse(response.body.string(), url)
+
+        // The 2026 site uses .manga-hero-* rather than the old Madara summary.
+        // Never call the old Madara detail parser: missing elements cause NPE.
+        val updatedManga = if (fetchDetails) {
+            manga.apply {
+                title = document.selectFirst(".manga-hero-title, h1")
+                    ?.text()?.trim()?.takeIf { it.isNotBlank() } ?: title
+
+                thumbnail_url = document.selectFirst("meta[property=og:image]")
+                    ?.attr("content")?.takeIf { it.startsWith("http") } ?: thumbnail_url
+
+                description = document.selectFirst(".synopsis-scrollable-content .summary__content")
+                    ?.text()?.trim()?.takeIf { it.isNotBlank() }
+                    ?: document.selectFirst(".synopsis-scrollable-content")
+                        ?.text()?.trim()?.takeIf { it.isNotBlank() }
+                    ?: description
+
+                author = document.select(".manga-hero-author .author-name a").text()
+                    .trim().takeIf { it.isNotBlank() } ?: author
+                artist = document.select(".brand-badge.badge-artist a").text()
+                    .trim().takeIf { it.isNotBlank() } ?: artist
+                genre = document.select(".manga-hero-genres a")
+                    .eachText().filter { it.isNotBlank() }.distinct()
+                    .joinToString(", ").takeIf { it.isNotBlank() } ?: genre
+
+                val siteStatus = document.selectFirst(".brand-badge.badge-status")
+                    ?.text()?.trim()?.lowercase().orEmpty()
+                status = when {
+                    siteStatus.contains("completo") || siteStatus.contains("conclu") -> SManga.COMPLETED
+                    siteStatus.contains("lançamento") || siteStatus.contains("andamento") -> SManga.ONGOING
+                    else -> status
+                }
+            }
+        } else {
+            manga
+        }
+
+        val updatedChapters = if (fetchChapters) {
+            document.select(".manga-chapters-list a.chapter-link, .listing-chapters_wrap a.chapter-link")
+                .mapNotNull { element ->
+                    val href = element.attr("abs:href").ifBlank { element.attr("href") }
+                    if (!href.startsWith("http")) return@mapNotNull null
+                    val name = element.text().trim()
+                    if (name.isBlank()) return@mapNotNull null
+
+                    SChapter.create().apply {
+                        setUrlWithoutDomain(href)
+                        this.name = name
+                    }
+                }
+                .distinctBy { it.url }
+                .also { if (it.isEmpty()) throw IOException("Portal Yaoi: nenhuma entrada .chapter-link encontrada na obra.") }
+        } else {
+            chapters
+        }
+        return SMangaUpdate(updatedManga, updatedChapters)
+    }
+
+    override suspend fun getPageList(chapter: SChapter): List<Page> {
+        val chapterUrl = getChapterUrl(chapter)
+        val response = client.get(chapterUrl, ensureSuccess = false)
+        if (!response.isSuccessful) {
+            throw IOException("Portal Yaoi: HTTP ${response.code} ao abrir o capítulo.")
+        }
+
+        val html = response.body.string()
+        val document = Jsoup.parse(html, chapterUrl)
+        // The reader mixes actual image URLs and transparent GIF placeholders.
+        // Encoded nodes use base64(reverse(XOR(url, runtimeKey))).
+        val runtimeKey = Regex("""(?:var|let|const)\s+_k\s*=\s*["']([^"']+)["']""")
+            .find(html)?.groupValues?.getOrNull(1).orEmpty()
+
+        val urls = document.select(".reading-content img.wp-manga-chapter-img")
+            .mapNotNull { image ->
+                val obfuscated = image.attr("data-content-node")
+                val url = when {
+                    obfuscated.isNotBlank() && runtimeKey.isNotBlank() ->
+                        decodeContentNode(obfuscated, runtimeKey)
+                    image.hasAttr("data-obf") ->
+                        decodePageUrl(image.attr("data-obf"))
+                    else -> {
+                        listOf("data-src", "data-lazy-src", "src")
+                            .asSequence()
+                            .map { image.attr("abs:$it") }
+                            .firstOrNull { it.startsWith("http://") || it.startsWith("https://") }
+                    }
+                }
+                url?.takeIf { it.startsWith("http://") || it.startsWith("https://") }
+            }
+            .distinct()
+
+        if (urls.isEmpty()) {
+            throw IOException("Portal Yaoi: nenhuma imagem válida encontrada no leitor (HTML ${html.length}, chave=${runtimeKey.isNotEmpty()}).")
+        }
+        return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
+    }
+
+    private fun decodeContentNode(value: String, key: String): String? {
+        if (key.isEmpty()) return null
+        return try {
+            val bytes = Base64.decode(value.reversed(), Base64.DEFAULT)
+            val decoded = CharArray(bytes.size) { index ->
+                ((bytes[index].toInt() and 0xff) xor key[index % key.length].code).toChar()
+            }
+            String(decoded).takeIf { it.startsWith("http://") || it.startsWith("https://") }
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
+
+    override fun imageRequest(page: Page): Request = super.imageRequest(page).newBuilder()
+        .header("Referer", page.url.ifBlank { "$baseUrl/" })
+        .build()
 
     override fun imageFromElement(element: Element): String? = when {
         element.hasAttr("data-obf") -> decodePageUrl(element.attr("data-obf"))
