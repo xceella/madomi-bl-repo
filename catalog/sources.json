@@ -13,7 +13,9 @@
   },
   {
     "slug": "portalyaoi",
-    "module": "src/pt/portalyaoi"
+    "module": "src/pt/portalyaoi",
+    "custom": "custom/pt/portalyaoi",
+    "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/portalyaoi/res/mipmap-xhdpi/ic_launcher.png"
   },
   {
     "slug": "xxxyaoi",
