@@ -8,15 +8,11 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
-import java.io.IOException
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import keiyoushi.annotation.Source
 import keiyoushi.network.get
 import keiyoushi.network.rateLimit
 import keiyoushi.utils.parseAs
 import keiyoushi.utils.runWebView
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -24,6 +20,10 @@ import okhttp3.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.io.IOException
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * XBL Portal Yaoi: keep upstream Madara reader and add a resilient search
@@ -170,7 +170,6 @@ abstract class PortalYaoi : MadaraNoAjax() {
             }
             .distinctBy { it.url }
     }
-
 
     override suspend fun fetchMangaUpdate(
         manga: SManga,
