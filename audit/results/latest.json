@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-26T15:39:36+00:00",
+  "generatedAt": "2026-11-02T18:59:28+00:00",
   "checks": [
     {
       "source": "Bodinho Yaoi",
@@ -166,9 +166,9 @@
       "url": "https://www.mangago.me/read-manga/the_blue_flows/",
       "search_raw": 1,
       "search_parsed": 1,
-      "chapters_declared": 86,
-      "chapters_raw": 86,
-      "chapters_parsed": 86,
+      "chapters_declared": 87,
+      "chapters_raw": 87,
+      "chapters_parsed": 87,
       "duplicate_chapters": 0,
       "pagination_detected": false,
       "status": "PASS",
@@ -227,8 +227,8 @@
       "search_raw": 24,
       "search_parsed": 24,
       "chapters_declared": null,
-      "chapters_raw": 37,
-      "chapters_parsed": 37,
+      "chapters_raw": 38,
+      "chapters_parsed": 38,
       "duplicate_chapters": 0,
       "pagination_detected": false,
       "status": "PASS",
