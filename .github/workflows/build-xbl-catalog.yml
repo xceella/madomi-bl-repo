@@ -13,10 +13,11 @@ on:
       - '.github/workflows/build-xbl-catalog.yml'
 
 permissions:
+  actions: write
   contents: write
 
 concurrency:
-  group: build-xbl-root-catalog
+  group: build-xbl-root-catalog-v2
   cancel-in-progress: true
 
 jobs:
@@ -27,6 +28,18 @@ jobs:
     steps:
       - name: Checkout do nosso repositório
         uses: actions/checkout@v4
+
+      - name: Cancelar builds anteriores do catálogo
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          gh run list --workflow build-xbl-catalog.yml --limit 20 --json databaseId,status |
+            jq -r --arg current "$CURRENT_RUN_ID" '.[] | select((.databaseId | tostring) != $current and (.status == "in_progress" or .status == "queued")) | .databaseId' |
+            while IFS= read -r run_id; do
+              echo "Cancelando execução anterior $run_id"
+              gh run cancel "$run_id" || true
+            done
 
       - name: Baixar o código-fonte do Keiyoushi
         run: |
