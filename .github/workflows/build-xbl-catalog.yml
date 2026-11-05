@@ -17,7 +17,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: build-xbl-root-catalog-v2
+  group: build-xbl-root-catalog-v3
   cancel-in-progress: true
 
 jobs:
