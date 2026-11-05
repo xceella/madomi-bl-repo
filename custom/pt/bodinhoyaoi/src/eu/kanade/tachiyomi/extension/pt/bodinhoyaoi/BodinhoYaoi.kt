@@ -425,7 +425,7 @@ abstract class BodinhoYaoi : KeiSource() {
         return results
     }
 
-    override fun imageRequest(page: Page): Request = super.imageRequest(page).newBuilder()
+    override fun getImageRequest(page: Page): Request = super.getImageRequest(page).newBuilder()
         .header("Referer", page.url.ifBlank { "$baseUrl/" })
         .build()
 }
