@@ -64,7 +64,7 @@ jobs:
             mkdir -p "upstream/$MODULE/res/mipmap-xhdpi"
             if [ -n "$ICON_URL" ]; then
               ICON_PATH="upstream/$MODULE/res/mipmap-xhdpi/ic_launcher.png"
-              if ! curl --connect-timeout 10 --max-time 30 --retry 1 --retry-delay 2 -fL "$ICON_URL" -o "$ICON_PATH"; then
+              if ! curl --connect-timeout 10 --max-time 20 -fL "$ICON_URL" -o "$ICON_PATH"; then
                 if [ "$MODULE" = "src/pt/bodinhoyaoi" ]; then
                   echo "::warning::Ícone oficial do Bodinho indisponível; usando ícone temporário da XXX Yaoi nesta build."
                   curl --connect-timeout 10 --max-time 30 -fL "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/xxxyaoi/res/mipmap-xhdpi/ic_launcher.png" -o "$ICON_PATH"
