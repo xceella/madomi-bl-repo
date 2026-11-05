@@ -289,7 +289,6 @@ abstract class PortalYaoi : MadaraNoAjax() {
         return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
     }
 
-
     private fun extractRuntimeKey(html: String): String {
         val encodedKey = Regex("""(?:var|let|const)\s+_k\s*=\s*atob\(["']([^"']+)["']\)""")
             .find(html)?.groupValues?.getOrNull(1)
