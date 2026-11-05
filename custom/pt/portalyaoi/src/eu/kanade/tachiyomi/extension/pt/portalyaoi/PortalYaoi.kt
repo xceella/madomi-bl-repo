@@ -290,7 +290,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
 
 
     private fun extractRuntimeKey(html: String): String {
-        val encodedKey = Regex("""(?:var|let|const)\\s+_k\\s*=\\s*atob\\(["']([^"']+)["']\\)""")
+        val encodedKey = Regex("""(?:var|let|const)\s+_k\s*=\s*atob\(["']([^"']+)["']\)""")
             .find(html)?.groupValues?.getOrNull(1)
 
         if (!encodedKey.isNullOrBlank()) {
@@ -302,7 +302,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
         }
 
         // Keep compatibility with older Portal versions that used a plain string.
-        return Regex("""(?:var|let|const)\\s+_k\\s*=\\s*["']([^"']+)["']""")
+        return Regex("""(?:var|let|const)\s+_k\s*=\s*["']([^"']+)["']""")
             .find(html)?.groupValues?.getOrNull(1).orEmpty()
     }
 
