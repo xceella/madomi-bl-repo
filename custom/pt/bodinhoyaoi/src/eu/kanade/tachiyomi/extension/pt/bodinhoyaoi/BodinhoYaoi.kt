@@ -7,6 +7,7 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.network.head
 import keiyoushi.source.KeiSource
@@ -35,7 +36,7 @@ abstract class BodinhoYaoi : KeiSource() {
         val url = "$baseUrl/biblioteca".toHttpUrl().newBuilder()
             .addQueryParameter("page", page.toString())
             .build()
-        return mangaListParse(client.get(url).asJsoup(), page)
+        return mangaListParse(client.get(url, Fetch.DOCUMENT).asJsoup(), page)
     }
 
     override suspend fun getLatestUpdates(page: Int): MangasPage {
@@ -43,7 +44,7 @@ abstract class BodinhoYaoi : KeiSource() {
             .addQueryParameter("order", "recent")
             .addQueryParameter("page", page.toString())
             .build()
-        return mangaListParse(client.get(url).asJsoup(), page)
+        return mangaListParse(client.get(url, Fetch.DOCUMENT).asJsoup(), page)
     }
 
     override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList): MangasPage {
@@ -52,7 +53,7 @@ abstract class BodinhoYaoi : KeiSource() {
         // The dynamic /busca route can intermittently stall long enough to hit
         // Madomi's 30 second source timeout. The sitemap is static, fast and
         // contains every work URL, so use it as the search index instead.
-        val document = client.get("$baseUrl/sitemap.xml").asJsoup()
+        val document = client.get("$baseUrl/sitemap.xml", Fetch.DOCUMENT).asJsoup()
         return MangasPage(searchFromSitemap(document, query), false)
     }
 
@@ -137,7 +138,7 @@ abstract class BodinhoYaoi : KeiSource() {
         fetchDetails: Boolean,
         fetchChapters: Boolean,
     ): SMangaUpdate {
-        val document = client.get(getMangaUrl(manga)).asJsoup()
+        val document = client.get(getMangaUrl(manga), Fetch.DOCUMENT).asJsoup()
 
         val updatedManga = if (fetchDetails) parseDetails(document, manga) else manga
         val updatedChapters = if (fetchChapters) parseChapters(document) else chapters
@@ -235,7 +236,7 @@ abstract class BodinhoYaoi : KeiSource() {
             .build()
 
         val directPages = try {
-            val response = client.get(chapterUrl, pageHeaders, ensureSuccess = false)
+            val response = client.get(chapterUrl, pageHeaders, Fetch.DOCUMENT, ensureSuccess = false)
             val html = response.body.string()
             initialHtml = html
             val document = Jsoup.parse(html, chapterUrl)

@@ -5,6 +5,7 @@ import eu.kanade.tachiyomi.multisrc.madara.MadaraNoAjax
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.model.SChapter
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.network.rateLimit
 import keiyoushi.utils.asJsoup
@@ -72,7 +73,7 @@ abstract class XXXYaoi : MadaraNoAjax() {
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterUrl = getChapterUrl(chapter)
-        val html = client.get(chapterUrl).body.string()
+        val html = client.get(chapterUrl, Fetch.DOCUMENT).body.string()
         val direct = html.asJsoup(chapterUrl)
         val directPages = extractPages(direct, chapterUrl)
         if (directPages.isNotEmpty()) return directPages

@@ -9,6 +9,7 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.network.rateLimit
 import keiyoushi.utils.parseAs
@@ -68,7 +69,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
         var forbidden = false
         for (target in targets) {
             val response = try {
-                client.get(target, ensureSuccess = false)
+                client.get(target, Fetch.DOCUMENT, ensureSuccess = false)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -121,7 +122,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
     }
 
     private suspend fun getCatalogueDocument(url: String): Document {
-        val response = client.get(url, ensureSuccess = false)
+        val response = client.get(url, Fetch.DOCUMENT, ensureSuccess = false)
         if (response.code == 403) {
             throw IOException("Portal Yaoi: HTTP 403 no catálogo. Abra a WebView para verificar o bloqueio.")
         }
@@ -178,7 +179,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
         fetchChapters: Boolean,
     ): SMangaUpdate {
         val url = getMangaUrl(manga)
-        val response = client.get(url, ensureSuccess = false)
+        val response = client.get(url, Fetch.DOCUMENT, ensureSuccess = false)
         if (!response.isSuccessful) {
             throw IOException("Portal Yaoi: HTTP ${response.code} nos detalhes da obra.")
         }
@@ -252,7 +253,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterUrl = getChapterUrl(chapter)
-        val response = client.get(chapterUrl, ensureSuccess = false)
+        val response = client.get(chapterUrl, Fetch.DOCUMENT, ensureSuccess = false)
         if (!response.isSuccessful) {
             throw IOException("Portal Yaoi: HTTP ${response.code} ao abrir o capítulo.")
         }
