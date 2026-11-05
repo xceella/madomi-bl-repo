@@ -6,7 +6,7 @@ plugins {
 
 keiyoushi {
     name = "Portal Yaoi"
-    versionCode = 60
+    versionCode = 61
     contentWarning = ContentWarning.NSFW
     libVersion = "1.6"
     theme = "madara"

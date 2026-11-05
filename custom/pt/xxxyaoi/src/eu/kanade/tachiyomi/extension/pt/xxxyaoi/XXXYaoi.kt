@@ -86,7 +86,7 @@ abstract class XXXYaoi : MadaraNoAjax() {
                     if (request.isForMainFrame) {
                         null
                     } else {
-                        WebResourceResponse("text/plain", null, 403, "Blocked", null, ByteArrayInputStream(ByteArray(0)))
+                        WebResourceResponse("text/javascript", null, 200, "OK", null, ByteArrayInputStream(ByteArray(0)))
                     }
                 }
                 onPageFinished {

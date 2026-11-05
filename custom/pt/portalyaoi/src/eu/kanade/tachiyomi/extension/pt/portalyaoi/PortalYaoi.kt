@@ -259,10 +259,9 @@ abstract class PortalYaoi : MadaraNoAjax() {
 
         val html = response.body.string()
         val document = Jsoup.parse(html, chapterUrl)
-        // The reader mixes actual image URLs and transparent GIF placeholders.
-        // Encoded nodes use base64(reverse(XOR(url, runtimeKey))).
-        val runtimeKey = Regex("""(?:var|let|const)\s+_k\s*=\s*["']([^"']+)["']""")
-            .find(html)?.groupValues?.getOrNull(1).orEmpty()
+        // The site now assigns _k through atob(base64Key). Decode that
+        // outer Base64 layer before using the key to decrypt data-content-node.
+        val runtimeKey = extractRuntimeKey(html)
 
         val urls = document.select(".reading-content img.wp-manga-chapter-img")
             .mapNotNull { image ->
@@ -287,6 +286,24 @@ abstract class PortalYaoi : MadaraNoAjax() {
             throw IOException("Portal Yaoi: nenhuma imagem válida encontrada no leitor (HTML ${html.length}, chave=${runtimeKey.isNotEmpty()}).")
         }
         return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
+    }
+
+
+    private fun extractRuntimeKey(html: String): String {
+        val encodedKey = Regex("""(?:var|let|const)\\s+_k\\s*=\\s*atob\\(["']([^"']+)["']\\)""")
+            .find(html)?.groupValues?.getOrNull(1)
+
+        if (!encodedKey.isNullOrBlank()) {
+            return try {
+                String(Base64.decode(encodedKey, Base64.DEFAULT), Charsets.UTF_8)
+            } catch (_: IllegalArgumentException) {
+                ""
+            }
+        }
+
+        // Keep compatibility with older Portal versions that used a plain string.
+        return Regex("""(?:var|let|const)\\s+_k\\s*=\\s*["']([^"']+)["']""")
+            .find(html)?.groupValues?.getOrNull(1).orEmpty()
     }
 
     private fun decodeContentNode(value: String, key: String): String? {
