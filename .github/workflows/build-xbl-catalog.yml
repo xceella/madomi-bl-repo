@@ -45,6 +45,13 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/keiyoushi/extensions-source.git upstream
 
+      - name: Corrigir domínio e versão da Fleur Blanche
+        run: |
+          FILE=upstream/src/pt/fleurblanche/build.gradle.kts
+          grep -q 'baseUrl = "https://fbsscan.com"' "$FILE" || { echo '::error::Domínio upstream inesperado para Fleur Blanche'; exit 1; }
+          sed -i -E 's/versionCode = [0-9]+/versionCode = 64/' "$FILE"
+          echo 'Fleur Blanche: fbsscan.com, versionCode 64 (upgrade de 1.6.63).'
+
       - name: Sobrepor extensões próprias XBL
         run: |
           while IFS= read -r row; do
