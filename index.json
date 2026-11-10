@@ -11,13 +11,13 @@
         "name": "Bodinho Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.bodinhoyaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.13/tachiyomi-pt.bodinhoyaoi-v1.6.13.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.14/tachiyomi-pt.bodinhoyaoi-v1.6.14.apk",
           "iconUrl": "https://bodinhoyaoi.com/logo-256.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.13/tachiyomi-pt.bodinhoyaoi-v1.6.13.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bodinhoyaoi-v1.6.14/tachiyomi-pt.bodinhoyaoi-v1.6.14.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106013",
-        "versionName": "1.6.13",
+        "versionCode": "106014",
+        "versionName": "1.6.14",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
@@ -74,20 +74,20 @@
         "name": "Fleur Blanche",
         "packageName": "eu.kanade.tachiyomi.extension.pt.fleurblanche",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.63/tachiyomi-pt.fleurblanche-v1.6.63.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.122/tachiyomi-pt.fleurblanche-v1.6.122.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/fleurblanche/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.63/tachiyomi-pt.fleurblanche-v1.6.63.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.122/tachiyomi-pt.fleurblanche-v1.6.122.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106063",
-        "versionName": "1.6.63",
+        "versionCode": "106122",
+        "versionName": "1.6.122",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
             "id": "2748000026130339026",
             "name": "Fleur Blanche",
             "language": "pt-BR",
-            "homeUrl": "https://fbsquadx.com"
+            "homeUrl": "https://fbsscan.com"
           }
         ]
       },
