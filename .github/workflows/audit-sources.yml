@@ -10,6 +10,7 @@ on:
       - 'audit/run_audit.py'
       - 'audit/run_audit_v2.py'
       - 'audit/check_active_sources.py'
+      - 'index.json'
       - '.github/workflows/audit-sources.yml'
   schedule:
     - cron: '0 9 * * 1'
