@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-10T21:30:44+00:00",
+  "generatedAt": "2026-11-10T23:03:29+00:00",
   "checks": [
     {
       "name": "Bodinho Yaoi",
@@ -27,10 +27,11 @@
     },
     {
       "name": "Fleur Blanche",
-      "url": "https://fbsquadx.com",
-      "status": "DOWN",
-      "http": null,
-      "note": "ConnectionError: HTTPSConnectionPool(host='fbsquadx.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='fbsquadx.com', port=4"
+      "url": "https://fbsscan.com",
+      "status": "UP",
+      "http": 200,
+      "note": "Página inicial acessível; leitura no Mihon não testada",
+      "finalUrl": "https://fbsscan.com/"
     },
     {
       "name": "FlowerManga.net",

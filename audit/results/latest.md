@@ -1,6 +1,6 @@
 # XBL Source Audit
 
-Gerado em **2026-11-10T21:30:41+00:00**.
+Gerado em **2026-11-10T23:03:24+00:00**.
 
 Esta auditoria procura obras que a busca pode descartar, capítulos que o parser pode deixar de indexar, duplicatas e sinais de paginação não percorrida.
 
