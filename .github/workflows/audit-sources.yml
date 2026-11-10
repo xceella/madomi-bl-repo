@@ -9,6 +9,7 @@ on:
       - 'audit/config.json'
       - 'audit/run_audit.py'
       - 'audit/run_audit_v2.py'
+      - 'audit/check_active_sources.py'
       - '.github/workflows/audit-sources.yml'
   schedule:
     - cron: '0 9 * * 1'
@@ -40,11 +41,14 @@ jobs:
       - name: Rodar auditoria
         run: python audit/run_audit_v2.py
 
+      - name: Verificar todas as fontes ativas do catálogo
+        run: python audit/check_active_sources.py
+
       - name: Publicar relatório
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add audit/results/latest.json audit/results/latest.md
+          git add audit/results/latest.json audit/results/latest.md audit/results/health.json audit/results/health.md
 
           if git diff --cached --quiet; then
             echo "Relatório sem alterações."
