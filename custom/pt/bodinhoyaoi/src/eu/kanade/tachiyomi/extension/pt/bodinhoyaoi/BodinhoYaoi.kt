@@ -12,6 +12,7 @@ import keiyoushi.network.get
 import keiyoushi.network.head
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
+import keiyoushi.utils.parseAs
 import keiyoushi.utils.runWebView
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -262,28 +263,10 @@ abstract class BodinhoYaoi : KeiSource() {
                     val rendered = runWebView<String>(7.seconds) {
                         userAgent = headers["User-Agent"].orEmpty()
                         blockImages = true
-                        jsBridge("xblBodinhoHtml") { resolve(it) }
                         onPageFinished {
-                            evaluateJs(
-                                """
-                                (function() {
-                                  if (window.__xblReaderProbeInstalled) return;
-                                  window.__xblReaderProbeInstalled = true;
-                                  var attempts = 0;
-                                  function extract() {
-                                    var images = document.querySelectorAll(
-                                      "img[src*='/chapters/'], img[data-src*='/chapters/'], img[data-lazy-src*='/chapters/']"
-                                    );
-                                    if (images.length > 0 || ++attempts >= 12) {
-                                      xblBodinhoHtml.post(document.documentElement.outerHTML);
-                                    } else {
-                                      setTimeout(extract, 250);
-                                    }
-                                  }
-                                  extract();
-                                })();
-                                """.trimIndent(),
-                            )
+                            evaluateJs("document.documentElement.outerHTML") {
+                                resolve(it.parseAs<String>())
+                            }
                         }
                         if (initialHtml != null) {
                             loadData(chapterUrl, initialHtml!!)
@@ -329,7 +312,7 @@ abstract class BodinhoYaoi : KeiSource() {
                     remaining
                 } else {
                     throw IOException(
-                        "Bodinho v1.6.11: direto=$httpDiagnostic; CDN=$cdnDiagnostic; web=$browserDiagnostic; sem imagens.",
+                        "Bodinho: direto=$httpDiagnostic; CDN=$cdnDiagnostic; web=$browserDiagnostic; sem imagens.",
                     )
                 }
             }
