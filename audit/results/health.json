@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-11-10T21:30:44+00:00",
+  "checks": [
+    {
+      "name": "Bodinho Yaoi",
+      "url": "https://bodinhoyaoi.com",
+      "status": "DOWN",
+      "http": 503,
+      "note": "Erro de servidor",
+      "finalUrl": "https://bodinhoyaoi.com/"
+    },
+    {
+      "name": "BR Yaoi",
+      "url": "https://bryaoi.com",
+      "status": "UP",
+      "http": 200,
+      "note": "Página inicial acessível; leitura no Mihon não testada",
+      "finalUrl": "https://bryaoi.com/"
+    },
+    {
+      "name": "Coven Scan",
+      "url": "https://covendasbruxonas.com",
+      "status": "UP",
+      "http": 200,
+      "note": "Página inicial acessível; leitura no Mihon não testada",
+      "finalUrl": "https://covendasbruxonas.com/bruxonas/"
+    },
+    {
+      "name": "Fleur Blanche",
+      "url": "https://fbsquadx.com",
+      "status": "DOWN",
+      "http": null,
+      "note": "ConnectionError: HTTPSConnectionPool(host='fbsquadx.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='fbsquadx.com', port=4"
+    },
+    {
+      "name": "FlowerManga.net",
+      "url": "https://flowermangas.net",
+      "status": "BLOCKED",
+      "http": 403,
+      "note": "Acesso restrito, rate limit ou bloqueio",
+      "finalUrl": "https://flowermangas.net/"
+    },
+    {
+      "name": "Nocturne Summer",
+      "url": "https://nocfsb.com",
+      "status": "UP",
+      "http": 200,
+      "note": "Página inicial acessível; leitura no Mihon não testada",
+      "finalUrl": "https://nocfsb.com/"
+    },
+    {
+      "name": "Portal Yaoi",
+      "url": "https://portalyaoi.com",
+      "status": "BLOCKED",
+      "http": 403,
+      "note": "Acesso restrito, rate limit ou bloqueio",
+      "finalUrl": "https://portalyaoi.com/"
+    },
+    {
+      "name": "XXX Yaoi",
+      "url": "https://3xyaoi.com",
+      "status": "BLOCKED",
+      "http": 403,
+      "note": "Acesso restrito, rate limit ou bloqueio",
+      "finalUrl": "https://3xyaoi.com/"
+    }
+  ]
+}
