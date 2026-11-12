@@ -57,4 +57,18 @@ jobs:
           fi
 
           git commit -m "Update XBL source audit report"
-          git push
+
+          # Other workflows may update index.json concurrently. Rebase before
+          # publishing and retry a short race instead of losing the audit.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push concorrente na tentativa $attempt; repetindo."
+            sleep 3
+          done
+
+          echo "::error::Não foi possível publicar o relatório após 3 tentativas."
+          exit 1
