@@ -32,5 +32,13 @@
   {
     "slug": "flowermanga",
     "module": "src/pt/flowermanga"
+  },
+  {
+    "slug": "amuy",
+    "module": "src/pt/amuy"
+  },
+  {
+    "slug": "yaoifanclub",
+    "module": "src/pt/yaoifanclub"
   }
 ]
