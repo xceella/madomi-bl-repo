@@ -32,12 +32,11 @@ abstract class FleurBlanche : MadaraNoAjax() {
 
     // The site lists Master-Peace as "God's Peace" without that alternate name.
     // Handle the known alias before delegating to the site's HTML search.
-    override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList) =
-        super.getSearchMangaList(
-            page,
-            if (query.trim().replace(" ", "").replace("-", "").equals("masterpeace", ignoreCase = true)) "Peace" else query,
-            filters,
-        )
+    override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList) = super.getSearchMangaList(
+        page,
+        if (query.trim().replace(" ", "").replace("-", "").equals("masterpeace", ignoreCase = true)) "Peace" else query,
+        filters,
+    )
 
     private fun authWarningIntercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
