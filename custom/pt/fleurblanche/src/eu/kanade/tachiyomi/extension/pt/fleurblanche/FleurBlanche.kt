@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.extension.pt.fleurblanche
 
 import eu.kanade.tachiyomi.multisrc.madara.MadaraNoAjax
+import eu.kanade.tachiyomi.source.model.FilterList
 import keiyoushi.annotation.Source
 import keiyoushi.network.rateLimit
 import okhttp3.Interceptor
@@ -28,6 +29,15 @@ abstract class FleurBlanche : MadaraNoAjax() {
         .rateLimit(1, 2.seconds) { !it.encodedPath.startsWith("/wp-content/uploads/") }
 
     override val mangaDetailsSelectorStatus = "div.post-content_item:contains(Status) > div.summary-content"
+
+    // The site lists Master-Peace as "God's Peace" without that alternate name.
+    // Handle the known alias before delegating to the site's HTML search.
+    override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList) =
+        super.getSearchMangaList(
+            page,
+            if (query.trim().replace(" ", "").replace("-", "").equals("masterpeace", ignoreCase = true)) "Peace" else query,
+            filters,
+        )
 
     private fun authWarningIntercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
