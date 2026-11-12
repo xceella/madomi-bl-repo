@@ -8,6 +8,27 @@
   "extensionList": {
     "extensions": [
       {
+        "name": "Amuy",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.amuy",
+        "resources": {
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-amuy-v1.6.62/tachiyomi-pt.amuy-v1.6.62.apk",
+          "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/amuy/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-amuy-v1.6.62/tachiyomi-pt.amuy-v1.6.62.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106062",
+        "versionName": "1.6.62",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "5257426184455231951",
+            "name": "Amuy",
+            "language": "pt-BR",
+            "homeUrl": "https://apenasmaisumyaoi.com"
+          }
+        ]
+      },
+      {
         "name": "BR Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.bryaoi",
         "resources": {
@@ -151,6 +172,27 @@
             "name": "XXX Yaoi",
             "language": "pt-BR",
             "homeUrl": "https://3xyaoi.com"
+          }
+        ]
+      },
+      {
+        "name": "Yaoi Fan Club",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.yaoifanclub",
+        "resources": {
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-yaoifanclub-v1.6.62/tachiyomi-pt.yaoifanclub-v1.6.62.apk",
+          "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/yaoifanclub/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-yaoifanclub-v1.6.62/tachiyomi-pt.yaoifanclub-v1.6.62.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106062",
+        "versionName": "1.6.62",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "1639406669358106687",
+            "name": "Yaoi Fan Club",
+            "language": "pt-BR",
+            "homeUrl": "https://yaoifanclub.com"
           }
         ]
       }
