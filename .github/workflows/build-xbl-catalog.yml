@@ -2,6 +2,21 @@ name: Build XBL Mihon PT-BR catalog
 
 on:
   workflow_dispatch:
+    inputs:
+      source:
+        description: 'Extensão para recompilar (all = recompilar as sete manualmente)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - bryaoi
+          - covenscan
+          - fleurblanche
+          - portalyaoi
+          - xxxyaoi
+          - nocturnesummer
+          - flowermanga
   push:
     branches:
       - main
@@ -28,8 +43,18 @@ jobs:
     steps:
       - name: Checkout do nosso repositório
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Selecionar somente extensões que mudaram
+        id: select
+        env:
+          XBL_BEFORE: ${{ github.event.before }}
+          XBL_MANUAL_SOURCE: ${{ inputs.source || 'all' }}
+        run: python tools/select_xbl_build.py
 
       - name: Cancelar builds anteriores do catálogo
+        if: steps.select.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           CURRENT_RUN_ID: ${{ github.run_id }}
@@ -42,16 +67,19 @@ jobs:
             done
 
       - name: Baixar o código-fonte do Keiyoushi
+        if: steps.select.outputs.changed == 'true'
         run: |
           git clone --depth 1 https://github.com/keiyoushi/extensions-source.git upstream
 
       - name: Confirmar domínio da Fleur Blanche
+        if: steps.select.outputs.changed == 'true'
         run: |
           FILE=upstream/src/pt/fleurblanche/build.gradle.kts
           grep -q 'baseUrl = "https://fbsscan.com"' "$FILE" || { echo '::error::Domínio upstream inesperado para Fleur Blanche'; exit 1; }
           echo 'Fleur Blanche: fbsscan.com confirmado; versão será calculada sem downgrade.'
 
       - name: Sobrepor extensões próprias XBL
+        if: steps.select.outputs.changed == 'true'
         run: |
           while IFS= read -r row; do
             CUSTOM=$(echo "$row" | jq -r '.custom // empty')
@@ -80,16 +108,17 @@ jobs:
                 fi
               fi
             fi
-          done < <(jq -c '.[]' catalog/sources.json)
+          done < <(jq -c '.[]' selected-sources.json)
 
-      - name: Sincronizar versões de todas as extensões com o catálogo publicado
+      - name: Incrementar versões somente das extensões selecionadas
+        if: steps.select.outputs.changed == 'true'
         run: |
           python - <<'PY'
           import json
           import re
           from pathlib import Path
 
-          catalog = json.loads(Path("catalog/sources.json").read_text(encoding="utf-8"))
+          catalog = json.loads(Path("selected-sources.json").read_text(encoding="utf-8"))
           published = json.loads(Path("index.json").read_text(encoding="utf-8"))["extensionList"]["extensions"]
           previous = {e["packageName"]: e for e in published}
           targets = {}
@@ -135,15 +164,18 @@ jobs:
           PY
 
       - name: Configurar Java 25
+        if: steps.select.outputs.changed == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '25'
 
       - name: Configurar Gradle
+        if: steps.select.outputs.changed == 'true'
         uses: gradle/actions/setup-gradle@v4
 
       - name: Preparar nossa chave de assinatura
+        if: steps.select.outputs.changed == 'true'
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
@@ -154,6 +186,7 @@ jobs:
           printf '%s' "$SIGNING_KEY" | base64 -d > upstream/signingkey.jks
 
       - name: Detectar alias da nossa chave
+        if: steps.select.outputs.changed == 'true'
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         run: |
@@ -177,6 +210,7 @@ jobs:
           echo "Alias detectado com sucesso."
 
       - name: Validar catálogo configurado
+        if: steps.select.outputs.changed == 'true'
         run: |
           COUNT=$(jq 'length' catalog/sources.json)
           if ! jq -e 'all(.[]; (.module | startswith("src/pt/")) and (.slug | length > 0))' catalog/sources.json >/dev/null; then
@@ -197,6 +231,7 @@ jobs:
           done < <(jq -r '.[].module' catalog/sources.json)
 
       - name: Compilar catálogo com nossa assinatura
+        if: steps.select.outputs.changed == 'true'
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -210,19 +245,20 @@ jobs:
           while read -r module; do
             gradle_module=":${module//\//:}:assembleRelease"
             TASKS+=("$gradle_module")
-          done < <(jq -r '.[].module' catalog/sources.json)
+          done < <(jq -r '.[].module' selected-sources.json)
 
           cd upstream
           chmod +x ./gradlew
           ./gradlew "${TASKS[@]}"
 
       - name: Conferir versões e pacotes compilados antes da publicação
+        if: steps.select.outputs.changed == 'true'
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          catalog = json.loads(Path("catalog/sources.json").read_text(encoding="utf-8"))
+          catalog = json.loads(Path("selected-sources.json").read_text(encoding="utf-8"))
           targets = json.loads(Path("version-targets.json").read_text(encoding="utf-8"))
           for entry in catalog:
               info_path = Path("upstream") / entry["module"] / "build/keiyoushi-source-info.json"
@@ -237,6 +273,7 @@ jobs:
           PY
 
       - name: Calcular fingerprint da nossa assinatura
+        if: steps.select.outputs.changed == 'true'
         id: fingerprint
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -257,6 +294,7 @@ jobs:
           echo "fingerprint=$FP" >> "$GITHUB_OUTPUT"
 
       - name: Preparar gerador do index.pb
+        if: steps.select.outputs.changed == 'true'
         run: |
           python -m pip install --disable-pip-version-check protobuf grpcio-tools
           cd tools
@@ -264,8 +302,11 @@ jobs:
           cd ..
           rm -rf generated-root
           mkdir -p generated-root
+          # Preserve every unchanged package/version/download URL in the active index.
+          cp index.json generated-root/index.json
 
       - name: Publicar nossas builds e montar o catálogo raiz
+        if: steps.select.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           FINGERPRINT: ${{ steps.fingerprint.outputs.fingerprint }}
@@ -327,9 +368,10 @@ jobs:
               --index-url "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/index.pb" \
               --name "XBL — Mihon PT-BR" \
               --badge-label "XBL"
-          done < <(jq -c '.[]' catalog/sources.json)
+          done < <(jq -c '.[]' selected-sources.json)
 
       - name: Validar catálogo final
+        if: steps.select.outputs.changed == 'true'
         run: |
           if ! jq -e '(.extensionList.extensions | all(.[]; (.sources | length > 0) and (.sources | all(.[]; .language == "pt-BR"))))' generated-root/index.json >/dev/null; then
             echo "::error::Catálogo gerado contém fontes não PT-BR."
@@ -344,12 +386,14 @@ jobs:
           echo "Catálogo final contém $COUNT extensões assinadas pela nossa chave."
 
       - name: Promover catálogo próprio para a raiz
+        if: steps.select.outputs.changed == 'true'
         run: |
           cp generated-root/index.pb index.pb
           cp generated-root/index.json index.json
           cp generated-root/repo.json repo.json
 
       - name: Salvar catálogo raiz no GitHub
+        if: steps.select.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -364,5 +408,5 @@ jobs:
           git push
 
       - name: Remover nossa chave do runner
-        if: always()
+        if: always() && steps.select.outputs.changed == 'true'
         run: rm -f upstream/signingkey.jks
