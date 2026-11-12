@@ -45,12 +45,11 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/keiyoushi/extensions-source.git upstream
 
-      - name: Corrigir domínio e versão da Fleur Blanche
+      - name: Confirmar domínio da Fleur Blanche
         run: |
           FILE=upstream/src/pt/fleurblanche/build.gradle.kts
           grep -q 'baseUrl = "https://fbsscan.com"' "$FILE" || { echo '::error::Domínio upstream inesperado para Fleur Blanche'; exit 1; }
-          sed -i -E 's/versionCode = [0-9]+/versionCode = 64/' "$FILE"
-          echo 'Fleur Blanche: fbsscan.com, versionCode 64 (upgrade de 1.6.63).'
+          echo 'Fleur Blanche: fbsscan.com confirmado; versão será calculada sem downgrade.'
 
       - name: Sobrepor extensões próprias XBL
         run: |
@@ -82,6 +81,46 @@ jobs:
               fi
             fi
           done < <(jq -c '.[]' catalog/sources.json)
+
+      - name: Sincronizar versões de todas as extensões com o catálogo publicado
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          catalog = json.loads(Path("catalog/sources.json").read_text(encoding="utf-8"))
+          published = json.loads(Path("index.json").read_text(encoding="utf-8"))["extensionList"]["extensions"]
+          previous = {e["packageName"]: e for e in published}
+          targets = {}
+
+          for source in catalog:
+              slug = source["slug"]
+              package = "eu.kanade.tachiyomi.extension.pt." + slug
+              old = previous.get(package)
+              if old is None:
+                  raise SystemExit(f"::error::Extensão ausente no catálogo publicado: {package}")
+              gradle = Path("upstream") / source["module"] / "build.gradle.kts"
+              text = gradle.read_text(encoding="utf-8")
+              match = re.search(r"(?m)^(\s*versionCode\s*=\s*)(\d+)", text)
+              library = re.search(r'libVersion\s*=\s*"(\d+\.\d+)"', text)
+              if not match or not library:
+                  raise SystemExit(f"::error::Gradle sem versão válida: {gradle}")
+              prefix = library.group(1) + "."
+              if not old["versionName"].startswith(prefix):
+                  raise SystemExit(f"::error::Versão publicada incompatível: {slug}, {old['versionName']}")
+              old_revision = int(old["versionName"][len(prefix):])
+              upstream_revision = int(match.group(2))
+              new_revision = max(old_revision, upstream_revision) + 1
+              text = text[:match.start(2)] + str(new_revision) + text[match.end(2):]
+              gradle.write_text(text, encoding="utf-8")
+              targets[package] = prefix + str(new_revision)
+              print(f"{slug}: {old['versionName']} -> {targets[package]} (base={upstream_revision})")
+
+          if len(targets) != len(catalog):
+              raise SystemExit("::error::Nem todas as extensões foram versionadas.")
+          Path("version-targets.json").write_text(json.dumps(targets, indent=2), encoding="utf-8")
+          PY
 
       - name: Configurar Java 25
         uses: actions/setup-java@v4
@@ -164,6 +203,26 @@ jobs:
           cd upstream
           chmod +x ./gradlew
           ./gradlew "${TASKS[@]}"
+
+      - name: Conferir versões e pacotes compilados antes da publicação
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          catalog = json.loads(Path("catalog/sources.json").read_text(encoding="utf-8"))
+          targets = json.loads(Path("version-targets.json").read_text(encoding="utf-8"))
+          for entry in catalog:
+              info_path = Path("upstream") / entry["module"] / "build/keiyoushi-source-info.json"
+              info = json.loads(info_path.read_text(encoding="utf-8"))
+              pkg = info["packageName"]
+              expected = targets.get(pkg)
+              if expected is None or info["versionName"] != expected:
+                  raise SystemExit(f"::error::Build divergente: {entry['slug']} -> {pkg} {info['versionName']}; esperado={expected}")
+              if not info.get("sources") or any(s["lang"] != "pt-BR" for s in info["sources"]):
+                  raise SystemExit(f"::error::Fonte fora do escopo PT-BR: {entry['slug']}")
+              print(f"OK: {info['name']} {info['versionName']} ({pkg})")
+          PY
 
       - name: Calcular fingerprint da nossa assinatura
         id: fingerprint
