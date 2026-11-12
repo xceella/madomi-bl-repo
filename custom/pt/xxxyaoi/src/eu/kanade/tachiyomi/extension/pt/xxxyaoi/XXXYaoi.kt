@@ -45,7 +45,11 @@ abstract class XXXYaoi : MadaraNoAjax() {
         .set("Priority", "u=0, i")
         .set("Pragma", "no-cache")
 
-    override val mangaSubString = "bl"
+    // XXX Yaoi now lists its catalog under /biblioteca/, while series URLs stay under /bl/.
+    override val mangaSubString = "biblioteca"
+
+    // New catalog cards have no Madara post IDs. Keep stable path-based IDs.
+    override val supportsPostId = false
 
     override val mangaDetailsSelectorTitle = ".xyaoi-main-title, h1"
     override val mangaDetailsSelectorAuthor = "a[href*=author]"
@@ -53,9 +57,11 @@ abstract class XXXYaoi : MadaraNoAjax() {
     override val mangaDetailsSelectorStatus = "span:contains(status) + span"
     override val mangaDetailsSelectorDescription = "[class*=synopsis]"
 
-    override fun searchCardSelector() = ".xyaoi-search-card"
+    // Both the library and search now render .xyaoi-card (not .xyaoi-search-card).
+    override fun archiveSelector() = ".xyaoi-card"
+    override fun searchCardSelector() = archiveSelector()
 
-    override val archiveUrlSelector = "h3 > a"
+    override val archiveUrlSelector = ".xyaoi-card-title a"
 
     override fun chapterFromElement(element: Element, mangaPath: String) = super.chapterFromElement(element, mangaPath)?.apply {
         // Keep the chapter-list fix; generated c_XXXXXXXX classes are unstable.
