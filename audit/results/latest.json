@@ -1,74 +1,6 @@
 {
-  "generatedAt": "2026-11-10T23:03:24+00:00",
+  "generatedAt": "2026-11-12T17:27:26+00:00",
   "checks": [
-    {
-      "source": "Bodinho Yaoi",
-      "query": "release",
-      "title": null,
-      "url": null,
-      "search_raw": null,
-      "search_parsed": null,
-      "chapters_declared": null,
-      "chapters_raw": null,
-      "chapters_parsed": null,
-      "duplicate_chapters": null,
-      "pagination_detected": null,
-      "status": "BLOCKED",
-      "notes": [
-        "Falha/timeout de rede: 503 Server Error: Service Unavailable for url: https://bodinhoyaoi.com/sitemap.xml"
-      ]
-    },
-    {
-      "source": "Bodinho Yaoi",
-      "query": "jinx",
-      "title": null,
-      "url": null,
-      "search_raw": null,
-      "search_parsed": null,
-      "chapters_declared": null,
-      "chapters_raw": null,
-      "chapters_parsed": null,
-      "duplicate_chapters": null,
-      "pagination_detected": null,
-      "status": "BLOCKED",
-      "notes": [
-        "Falha/timeout de rede: 503 Server Error: Service Unavailable for url: https://bodinhoyaoi.com/sitemap.xml"
-      ]
-    },
-    {
-      "source": "Bodinho Yaoi",
-      "query": "low tide",
-      "title": null,
-      "url": null,
-      "search_raw": null,
-      "search_parsed": null,
-      "chapters_declared": null,
-      "chapters_raw": null,
-      "chapters_parsed": null,
-      "duplicate_chapters": null,
-      "pagination_detected": null,
-      "status": "BLOCKED",
-      "notes": [
-        "Falha/timeout de rede: 503 Server Error: Service Unavailable for url: https://bodinhoyaoi.com/sitemap.xml"
-      ]
-    },
-    {
-      "source": "Bodinho Yaoi",
-      "query": "desire me if you can",
-      "title": null,
-      "url": null,
-      "search_raw": null,
-      "search_parsed": null,
-      "chapters_declared": null,
-      "chapters_raw": null,
-      "chapters_parsed": null,
-      "duplicate_chapters": null,
-      "pagination_detected": null,
-      "status": "BLOCKED",
-      "notes": [
-        "Falha/timeout de rede: 503 Server Error: Service Unavailable for url: https://bodinhoyaoi.com/sitemap.xml"
-      ]
-    },
     {
       "source": "BR Yaoi",
       "query": "release",
@@ -166,9 +98,9 @@
       "url": "https://www.mangago.me/read-manga/the_blue_flows/",
       "search_raw": 1,
       "search_parsed": 1,
-      "chapters_declared": 87,
-      "chapters_raw": 87,
-      "chapters_parsed": 87,
+      "chapters_declared": 89,
+      "chapters_raw": 89,
+      "chapters_parsed": 89,
       "duplicate_chapters": 0,
       "pagination_detected": false,
       "status": "PASS",
