@@ -1,26 +1,23 @@
 {
   "sources": [
     {
-      "id": "bodinhoyaoi",
-      "name": "Bodinho Yaoi",
-      "driver": "bodinho",
-      "baseUrl": "https://bodinhoyaoi.com",
-      "tests": [
-        {"query": "release", "expectTitle": "Release Your Persona"},
-        {"query": "jinx", "expectTitle": "Jinx"},
-        {"query": "low tide", "expectTitle": "Low Tide in Twilight"},
-        {"query": "desire me if you can", "expectTitle": "Desire Me If You Can"}
-      ]
-    },
-    {
       "id": "bryaoi",
       "name": "BR Yaoi",
       "driver": "bryaoi",
       "baseUrl": "https://bryaoi.com",
       "tests": [
-        {"query": "release", "expectTitle": "Release Your Persona"},
-        {"query": "jinx", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": "Deseje-me se puder"}
+        {
+          "query": "release",
+          "expectTitle": "Release Your Persona"
+        },
+        {
+          "query": "jinx",
+          "expectTitle": null
+        },
+        {
+          "query": "desire me if you can",
+          "expectTitle": "Deseje-me se puder"
+        }
       ]
     },
     {
@@ -29,8 +26,14 @@
       "driver": "manhwazone",
       "baseUrl": "https://manhwazone.com",
       "tests": [
-        {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null}
+        {
+          "query": "jinx",
+          "expectTitle": null
+        },
+        {
+          "query": "low tide",
+          "expectTitle": null
+        }
       ]
     },
     {
@@ -39,9 +42,18 @@
       "driver": "mangago",
       "baseUrl": "https://www.mangago.me",
       "tests": [
-        {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": "Desire Me if You Can"}
+        {
+          "query": "jinx",
+          "expectTitle": null
+        },
+        {
+          "query": "low tide",
+          "expectTitle": null
+        },
+        {
+          "query": "desire me if you can",
+          "expectTitle": "Desire Me if You Can"
+        }
       ]
     },
     {
@@ -50,9 +62,18 @@
       "driver": "mangak",
       "baseUrl": "https://mangak.io",
       "tests": [
-        {"query": "jinx", "expectTitle": null},
-        {"query": "low tide", "expectTitle": null},
-        {"query": "desire me if you can", "expectTitle": "Desire Me if You Can"}
+        {
+          "query": "jinx",
+          "expectTitle": null
+        },
+        {
+          "query": "low tide",
+          "expectTitle": null
+        },
+        {
+          "query": "desire me if you can",
+          "expectTitle": "Desire Me if You Can"
+        }
       ]
     }
   ]
