@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: 'Extensão para recompilar (all = recompilar as sete manualmente)'
+        description: 'Extensão para recompilar (all = recompilar o catálogo inteiro manualmente)'
         required: true
         default: 'all'
         type: choice
@@ -17,6 +17,8 @@ on:
           - xxxyaoi
           - nocturnesummer
           - flowermanga
+          - amuy
+          - yaoifanclub
   push:
     branches:
       - main
@@ -127,8 +129,6 @@ jobs:
               slug = source["slug"]
               package = "eu.kanade.tachiyomi.extension.pt." + slug
               old = previous.get(package)
-              if old is None:
-                  raise SystemExit(f"::error::Extensão ausente no catálogo publicado: {package}")
               gradle = Path("upstream") / source["module"] / "build.gradle.kts"
               text = gradle.read_text(encoding="utf-8")
               match = re.search(r"(?m)^(\s*versionCode\s*=\s*)(\d+)", text)
@@ -136,10 +136,12 @@ jobs:
               if not match or not library:
                   raise SystemExit(f"::error::Gradle sem versão válida: {gradle}")
               prefix = library.group(1) + "."
-              if not old["versionName"].startswith(prefix):
-                  raise SystemExit(f"::error::Versão publicada incompatível: {slug}, {old['versionName']}")
-              old_revision = int(old["versionName"][len(prefix):])
               upstream_revision = int(match.group(2))
+              if old is not None and not old["versionName"].startswith(prefix):
+                  raise SystemExit(f"::error::Versão publicada incompatível: {slug}, {old['versionName']}")
+              # A brand-new extension has no previously published XBL version.
+              # Start just above the upstream revision; do not touch other modules.
+              old_revision = int(old["versionName"][len(prefix):]) if old else upstream_revision
               theme = re.search(r'theme\s*=\s*"([^"]+)"', text)
               theme_offset = 0
               if theme:
@@ -156,7 +158,8 @@ jobs:
               text = text[:match.start(2)] + str(new_revision) + text[match.end(2):]
               gradle.write_text(text, encoding="utf-8")
               targets[package] = prefix + str(next_published_revision)
-              print(f"{slug}: {old['versionName']} -> {targets[package]} (modulo={new_revision}; tema={theme_offset})")
+              previous_version = old["versionName"] if old else "(nova extensão)"
+              print(f"{slug}: {previous_version} -> {targets[package]} (modulo={new_revision}; tema={theme_offset})")
 
           if len(targets) != len(catalog):
               raise SystemExit("::error::Nem todas as extensões foram versionadas.")
