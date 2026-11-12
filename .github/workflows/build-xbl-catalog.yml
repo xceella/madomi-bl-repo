@@ -111,11 +111,23 @@ jobs:
                   raise SystemExit(f"::error::Versão publicada incompatível: {slug}, {old['versionName']}")
               old_revision = int(old["versionName"][len(prefix):])
               upstream_revision = int(match.group(2))
-              new_revision = max(old_revision, upstream_revision) + 1
+              theme = re.search(r'theme\s*=\s*"([^"]+)"', text)
+              theme_offset = 0
+              if theme:
+                  theme_gradle = Path("upstream/lib-multisrc") / theme.group(1) / "build.gradle.kts"
+                  theme_text = theme_gradle.read_text(encoding="utf-8")
+                  base = re.search(r"baseVersionCode\s*=\s*(\d+)", theme_text)
+                  if base is None:
+                      raise SystemExit(f"::error::Tema sem baseVersionCode: {theme_gradle}")
+                  theme_offset = int(base.group(1))
+              next_published_revision = max(old_revision, upstream_revision + theme_offset) + 1
+              new_revision = next_published_revision - theme_offset
+              if new_revision < 1:
+                  raise SystemExit(f"::error::Versão de código inválida para {slug}")
               text = text[:match.start(2)] + str(new_revision) + text[match.end(2):]
               gradle.write_text(text, encoding="utf-8")
-              targets[package] = prefix + str(new_revision)
-              print(f"{slug}: {old['versionName']} -> {targets[package]} (base={upstream_revision})")
+              targets[package] = prefix + str(next_published_revision)
+              print(f"{slug}: {old['versionName']} -> {targets[package]} (modulo={new_revision}; tema={theme_offset})")
 
           if len(targets) != len(catalog):
               raise SystemExit("::error::Nem todas as extensões foram versionadas.")
