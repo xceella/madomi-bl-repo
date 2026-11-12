@@ -11,13 +11,13 @@
         "name": "BR Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.bryaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bryaoi-v1.6.3/tachiyomi-pt.bryaoi-v1.6.3.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bryaoi-v1.6.4/tachiyomi-pt.bryaoi-v1.6.4.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/bryaoi/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bryaoi-v1.6.3/tachiyomi-pt.bryaoi-v1.6.3.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-bryaoi-v1.6.4/tachiyomi-pt.bryaoi-v1.6.4.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106003",
-        "versionName": "1.6.3",
+        "versionCode": "106004",
+        "versionName": "1.6.4",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
@@ -32,13 +32,13 @@
         "name": "Coven Scan",
         "packageName": "eu.kanade.tachiyomi.extension.pt.covenscan",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-covenscan-v1.6.63/tachiyomi-pt.covenscan-v1.6.63.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-covenscan-v1.6.64/tachiyomi-pt.covenscan-v1.6.64.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/covenscan/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-covenscan-v1.6.63/tachiyomi-pt.covenscan-v1.6.63.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-covenscan-v1.6.64/tachiyomi-pt.covenscan-v1.6.64.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106063",
-        "versionName": "1.6.63",
+        "versionCode": "106064",
+        "versionName": "1.6.64",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
@@ -53,13 +53,13 @@
         "name": "Fleur Blanche",
         "packageName": "eu.kanade.tachiyomi.extension.pt.fleurblanche",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.124/tachiyomi-pt.fleurblanche-v1.6.124.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.125/tachiyomi-pt.fleurblanche-v1.6.125.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/fleurblanche/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.124/tachiyomi-pt.fleurblanche-v1.6.124.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-fleurblanche-v1.6.125/tachiyomi-pt.fleurblanche-v1.6.125.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106124",
-        "versionName": "1.6.124",
+        "versionCode": "106125",
+        "versionName": "1.6.125",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
@@ -74,13 +74,13 @@
         "name": "FlowerManga.net",
         "packageName": "eu.kanade.tachiyomi.extension.pt.flowermanga",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-flowermanga-v1.6.64/tachiyomi-pt.flowermanga-v1.6.64.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-flowermanga-v1.6.65/tachiyomi-pt.flowermanga-v1.6.65.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/flowermanga/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-flowermanga-v1.6.64/tachiyomi-pt.flowermanga-v1.6.64.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-flowermanga-v1.6.65/tachiyomi-pt.flowermanga-v1.6.65.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106064",
-        "versionName": "1.6.64",
+        "versionCode": "106065",
+        "versionName": "1.6.65",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
@@ -95,13 +95,13 @@
         "name": "Nocturne Summer",
         "packageName": "eu.kanade.tachiyomi.extension.pt.nocturnesummer",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-nocturnesummer-v1.6.62/tachiyomi-pt.nocturnesummer-v1.6.62.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-nocturnesummer-v1.6.63/tachiyomi-pt.nocturnesummer-v1.6.63.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/nocturnesummer/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-nocturnesummer-v1.6.62/tachiyomi-pt.nocturnesummer-v1.6.62.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-nocturnesummer-v1.6.63/tachiyomi-pt.nocturnesummer-v1.6.63.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106062",
-        "versionName": "1.6.62",
+        "versionCode": "106063",
+        "versionName": "1.6.63",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
@@ -116,13 +116,13 @@
         "name": "Portal Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.portalyaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.122/tachiyomi-pt.portalyaoi-v1.6.122.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.123/tachiyomi-pt.portalyaoi-v1.6.123.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/portalyaoi/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.122/tachiyomi-pt.portalyaoi-v1.6.122.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-portalyaoi-v1.6.123/tachiyomi-pt.portalyaoi-v1.6.123.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106122",
-        "versionName": "1.6.122",
+        "versionCode": "106123",
+        "versionName": "1.6.123",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
@@ -137,13 +137,13 @@
         "name": "XXX Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.xxxyaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.69/tachiyomi-pt.xxxyaoi-v1.6.69.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.70/tachiyomi-pt.xxxyaoi-v1.6.70.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/xxxyaoi/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.69/tachiyomi-pt.xxxyaoi-v1.6.69.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.70/tachiyomi-pt.xxxyaoi-v1.6.70.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106069",
-        "versionName": "1.6.69",
+        "versionCode": "106070",
+        "versionName": "1.6.70",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
