@@ -9,7 +9,9 @@
   },
   {
     "slug": "fleurblanche",
-    "module": "src/pt/fleurblanche"
+    "module": "src/pt/fleurblanche",
+    "custom": "custom/pt/fleurblanche",
+    "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/fleurblanche/res/mipmap-xhdpi/ic_launcher.png"
   },
   {
     "slug": "portalyaoi",
