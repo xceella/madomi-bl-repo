@@ -259,34 +259,63 @@ abstract class PortalYaoi : MadaraNoAjax() {
         }
 
         val html = response.body.string()
-        val document = Jsoup.parse(html, chapterUrl)
-        // The site now assigns _k through atob(base64Key). Decode that
-        // outer Base64 layer before using the key to decrypt data-content-node.
-        val runtimeKey = extractRuntimeKey(html)
+        var urls = extractChapterImages(html, chapterUrl)
 
-        val urls = document.select(".reading-content img.wp-manga-chapter-img")
-            .mapNotNull { image ->
-                val obfuscated = image.attr("data-content-node")
-                val url = when {
-                    obfuscated.isNotBlank() && runtimeKey.isNotBlank() ->
-                        decodeContentNode(obfuscated, runtimeKey)
-                    image.hasAttr("data-obf") ->
-                        decodePageUrl(image.attr("data-obf"))
-                    else -> {
-                        listOf("data-src", "data-lazy-src", "src")
-                            .asSequence()
-                            .map { image.attr("abs:$it") }
-                            .firstOrNull { it.startsWith("http://") || it.startsWith("https://") }
+        // The Portal sometimes serves a different reader to native HTTP clients.
+        // Only fall back to WebView when the HTML has no usable image URLs.
+        if (urls.isEmpty()) {
+            val rendered = try {
+                runWebView<String>(20.seconds) {
+                    userAgent = headers["User-Agent"].orEmpty()
+                    blockImages = true
+                    onPageFinished {
+                        evaluateJs("document.documentElement.outerHTML") { resolve(it.parseAs<String>()) }
                     }
+                    loadUrl(chapterUrl)
                 }
-                url?.takeIf { it.startsWith("http://") || it.startsWith("https://") }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                null
             }
-            .distinct()
+            if (rendered != null) {
+                urls = extractChapterImages(rendered, chapterUrl)
+            }
+        }
 
         if (urls.isEmpty()) {
-            throw IOException("Portal Yaoi: nenhuma imagem válida encontrada no leitor (HTML ${html.length}, chave=${runtimeKey.isNotEmpty()}).")
+            throw IOException("Portal Yaoi: leitor sem imagens válidas (HTML ${html.length}). Confira se o capítulo abre na WebView.")
         }
         return urls.mapIndexed { index, url -> Page(index, chapterUrl, url) }
+    }
+
+    private fun extractChapterImages(html: String, chapterUrl: String): List<String> {
+        val document = Jsoup.parse(html, chapterUrl)
+        val runtimeKey = extractRuntimeKey(html)
+        return document.select(".reading-content img, .page-break img, img.wp-manga-chapter-img")
+            .mapNotNull { image ->
+                val obfuscated = image.attr("data-content-node")
+                val decodedNode = if (obfuscated.isNotBlank() && runtimeKey.isNotBlank()) {
+                    decodeContentNode(obfuscated, runtimeKey)
+                } else {
+                    null
+                }
+                val decodedLegacy = if (image.hasAttr("data-obf")) {
+                    runCatching { decodePageUrl(image.attr("data-obf")) }.getOrNull()
+                } else {
+                    null
+                }
+                sequenceOf(
+                    decodedNode,
+                    decodedLegacy,
+                    image.attr("abs:data-src"),
+                    image.attr("abs:data-lazy-src"),
+                    image.attr("abs:data-original"),
+                    image.attr("abs:data-url"),
+                    image.attr("abs:src"),
+                ).filterNotNull().firstOrNull { it.startsWith("https://") || it.startsWith("http://") }
+            }
+            .distinct()
     }
 
     private fun extractRuntimeKey(html: String): String {
