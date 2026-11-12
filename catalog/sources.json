@@ -24,12 +24,6 @@
     "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/xxxyaoi/res/mipmap-xhdpi/ic_launcher.png"
   },
   {
-    "slug": "bodinhoyaoi",
-    "module": "src/pt/bodinhoyaoi",
-    "custom": "custom/pt/bodinhoyaoi",
-    "iconUrl": "https://bodinhoyaoi.com/logo-256.png"
-  },
-  {
     "slug": "nocturnesummer",
     "module": "src/pt/nocturnesummer"
   },
