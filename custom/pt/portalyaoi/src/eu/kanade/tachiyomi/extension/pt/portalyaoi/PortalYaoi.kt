@@ -222,7 +222,13 @@ abstract class PortalYaoi : MadaraNoAjax() {
         }
 
         val updatedChapters = if (fetchChapters) {
-            document.select(".manga-chapters-list a.chapter-link, .listing-chapters_wrap a.chapter-link")
+            document.select(
+                ".manga-chapters-list a.chapter-item-link, " +
+                    ".listing-chapters_wrap a.chapter-item-link, " +
+                    ".manga-chapters-list a.chapter-link, " +
+                    ".listing-chapters_wrap a.chapter-link, " +
+                    ".listing-chapters_wrap li.wp-manga-chapter a[href*='/manga/']",
+            )
                 .mapNotNull { element ->
                     val href = element.attr("abs:href").ifBlank { element.attr("href") }
                     if (!href.startsWith("http")) return@mapNotNull null
@@ -235,7 +241,7 @@ abstract class PortalYaoi : MadaraNoAjax() {
                     }
                 }
                 .distinctBy { it.url }
-                .also { if (it.isEmpty()) throw IOException("Portal Yaoi: nenhuma entrada .chapter-link encontrada na obra.") }
+                .also { if (it.isEmpty()) throw IOException("Portal Yaoi: nenhuma entrada de capítulo encontrada na obra (.chapter-item-link / .chapter-link).") }
         } else {
             chapters
         }
