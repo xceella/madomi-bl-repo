@@ -158,13 +158,13 @@
         "name": "XXX Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.xxxyaoi",
         "resources": {
-          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.70/tachiyomi-pt.xxxyaoi-v1.6.70.apk",
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.71/tachiyomi-pt.xxxyaoi-v1.6.71.apk",
           "iconUrl": "https://raw.githubusercontent.com/keiyoushi/extensions-source/main/src/pt/xxxyaoi/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.70/tachiyomi-pt.xxxyaoi-v1.6.70.jar"
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-xxxyaoi-v1.6.71/tachiyomi-pt.xxxyaoi-v1.6.71.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106070",
-        "versionName": "1.6.70",
+        "versionCode": "106071",
+        "versionName": "1.6.71",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {
