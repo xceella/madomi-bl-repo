@@ -2,18 +2,29 @@ package eu.kanade.tachiyomi.extension.pt.xxxyaoi
 
 import android.webkit.WebResourceResponse
 import eu.kanade.tachiyomi.multisrc.madara.MadaraNoAjax
+import eu.kanade.tachiyomi.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.MangasPage
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.model.SChapter
 import keiyoushi.annotation.Source
 import keiyoushi.network.Fetch
 import keiyoushi.network.get
+import keiyoushi.network.post
 import keiyoushi.network.rateLimit
 import keiyoushi.utils.asJsoup
 import keiyoushi.utils.parseAs
 import keiyoushi.utils.runWebView
 import kotlinx.coroutines.CancellationException
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.Headers
 import okhttp3.OkHttpClient
+import okhttp3.FormBody
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.ByteArrayInputStream
@@ -62,6 +73,49 @@ abstract class XXXYaoi : MadaraNoAjax() {
     override fun searchCardSelector() = archiveSelector()
 
     override val archiveUrlSelector = ".xyaoi-card-title a"
+
+    // Since November 2026 the site's WordPress ?s=... search route returns HTTP 404.
+    // The public /biblioteca/ search uses this WordPress AJAX action instead.
+    override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList): MangasPage {
+        if (query.isBlank()) return super.getSearchMangaList(page, query, filters)
+
+        val requestBody = FormBody.Builder()
+            .add("action", "xyaoi_library_filter")
+            .add("search", query.trim())
+            .add("status", "")
+            .add("genre", "")
+            .add("orderby", "latest")
+            .add("page", page.toString())
+            .build()
+
+        val requestHeaders = xhrHeaders.newBuilder()
+            .set("Referer", "$baseUrl/biblioteca/")
+            .set("Origin", baseUrl)
+            .set("Accept", "application/json, text/javascript, */*; q=0.01")
+            .set("Sec-Fetch-Site", "same-origin")
+            .set("Sec-Fetch-Mode", "cors")
+            .set("Sec-Fetch-Dest", "empty")
+            .build()
+
+        val response = client.post(
+            "$baseUrl/wp-admin/admin-ajax.php",
+            requestHeaders,
+            Fetch.XHR,
+            requestBody,
+        ).body.string().parseAs<JsonObject>()
+
+        if (response["success"]?.jsonPrimitive?.booleanOrNull != true) {
+            throw IOException("XXX Yaoi: o servidor não retornou resultados válidos da biblioteca.")
+        }
+
+        val payload = response["data"]?.jsonObject
+            ?: throw IOException("XXX Yaoi: resposta sem dados da biblioteca.")
+        val cardsHtml = payload["html"]?.jsonPrimitive?.contentOrNull
+            ?: throw IOException("XXX Yaoi: resposta sem HTML de resultados.")
+        val lastPage = payload["total_pages"]?.jsonPrimitive?.intOrNull ?: page
+        val document = Jsoup.parse(cardsHtml, "$baseUrl/biblioteca/")
+        return MangasPage(parseArchive(document), page < lastPage)
+    }
 
     override fun chapterFromElement(element: Element, mangaPath: String) = super.chapterFromElement(element, mangaPath)?.apply {
         // Keep the chapter-list fix; generated c_XXXXXXXX classes are unstable.
