@@ -29,6 +29,27 @@
         ]
       },
       {
+        "name": "Black Paradise",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.blackparadise",
+        "resources": {
+          "apkUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-blackparadise-v1.6.60/tachiyomi-pt.blackparadise-v1.6.60.apk",
+          "iconUrl": "https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/custom/pt/blackparadise/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/xceella/madomi-bl-repo/releases/download/xbl-blackparadise-v1.6.60/tachiyomi-pt.blackparadise-v1.6.60.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106060",
+        "versionName": "1.6.60",
+        "contentWarning": "CONTENT_WARNING_NSFW",
+        "sources": [
+          {
+            "id": "2549555394338633680",
+            "name": "Black Paradise",
+            "language": "pt-BR",
+            "homeUrl": "https://blackparadiseyaoi.com"
+          }
+        ]
+      },
+      {
         "name": "BR Yaoi",
         "packageName": "eu.kanade.tachiyomi.extension.pt.bryaoi",
         "resources": {
