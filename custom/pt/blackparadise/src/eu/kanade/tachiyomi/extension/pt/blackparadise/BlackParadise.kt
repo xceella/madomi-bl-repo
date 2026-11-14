@@ -11,6 +11,9 @@ import keiyoushi.annotation.Source
 import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.network.rateLimit
+import keiyoushi.utils.parseAs
+import keiyoushi.utils.runWebView
+import kotlinx.coroutines.CancellationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -84,13 +87,65 @@ abstract class BlackParadise : MadaraNoAjax() {
             .map { image.attr("abs:" + it).trim() }
             .firstOrNull { it.startsWith("https://") || it.startsWith("http://") }
 
+    private fun hasChapterList(doc: Document): Boolean = doc.select(
+        ".listing-chapters_wrap li.wp-manga-chapter a[href], " +
+            ".bp-chapters-redesign-item a.bp-chapters-redesign-link[href]",
+    ).isNotEmpty()
+
+    /**
+     * Some pages are served as lightweight "bp-fast" prepaint HTML with no chapter data.
+     * Retry with an uncached URL before falling back to the real Android WebView.
+     */
+    private suspend fun fullDocument(url: String, reader: Boolean = false): Document {
+        fun hasContent(doc: Document): Boolean = if (reader) {
+            doc.select(".reading-content img.wp-manga-chapter-img, .reading-content .page-break img").isNotEmpty()
+        } else {
+            hasChapterList(doc)
+        }
+        val first = document(url)
+        if (hasContent(first)) return first
+
+        val retryUrl = url.toHttpUrl().newBuilder()
+            .addQueryParameter("xbl_refresh", System.currentTimeMillis().toString())
+            .build().toString()
+        val uncached = try {
+            document(retryUrl)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            first
+        }
+        if (hasContent(uncached)) return uncached
+
+        val rendered = try {
+            runWebView<String>(25.seconds) {
+                userAgent = headers["User-Agent"].orEmpty()
+                blockImages = true
+                onPageFinished {
+                    evaluateJs("document.documentElement.outerHTML") { resolve(it.parseAs<String>()) }
+                }
+                loadUrl(retryUrl)
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
+        if (rendered != null) {
+            val webDoc = Jsoup.parse(rendered, url)
+            if (hasContent(webDoc)) return webDoc
+        }
+        return uncached
+    }
+
     override suspend fun fetchMangaUpdate(
         manga: SManga,
         chapters: List<SChapter>,
         fetchDetails: Boolean,
         fetchChapters: Boolean,
     ): SMangaUpdate {
-        val doc = document(getMangaUrl(manga))
+        val targetUrl = getMangaUrl(manga)
+        val doc = fullDocument(targetUrl)
         val details = if (fetchDetails) manga.apply {
             title = doc.selectFirst(".post-title h1, h1")?.text()?.trim()?.ifBlank { title } ?: title
             thumbnail_url = doc.selectFirst(".summary_image img")?.let(::imageAttribute) ?: thumbnail_url
@@ -114,8 +169,8 @@ abstract class BlackParadise : MadaraNoAjax() {
 
         val listed = if (fetchChapters) {
             // Native Madara links retain /season/ paths and correct ordering.
-            val links = doc.select(".listing-chapters_wrap li.wp-manga-chapter > a[href]")
-                .ifEmpty { doc.select("li.bp-chapters-redesign-item a.bp-chapters-redesign-link") }
+            val links = doc.select(".listing-chapters_wrap li.wp-manga-chapter a[href]")
+                .ifEmpty { doc.select(".bp-chapters-redesign-item a.bp-chapters-redesign-link[href]") }
             val found = links.mapNotNull { link ->
                 val name = link.text().trim()
                 val url = link.attr("abs:href")
@@ -125,7 +180,14 @@ abstract class BlackParadise : MadaraNoAjax() {
                     this.name = name
                 }
             }.distinctBy { it.url }
-            if (found.isEmpty()) throw IOException("Black Paradise: não foi possível localizar os capítulos.")
+            if (found.isEmpty()) {
+                val hint = if (doc.html().contains("bp-fast295") || doc.html().contains("bp-header-pending")) {
+                    "A página devolveu HTML incompleto (modo prepaint)."
+                } else {
+                    "A estrutura dos capítulos não foi reconhecida."
+                }
+                throw IOException("Black Paradise: $hint Consulte a WebView. URL: $targetUrl")
+            }
             found
         } else chapters
         return SMangaUpdate(details, listed)
@@ -142,7 +204,7 @@ abstract class BlackParadise : MadaraNoAjax() {
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val url = getChapterUrl(chapter)
-        val doc = document(url)
+        val doc = fullDocument(url, reader = true)
         val images = doc.select(".reading-content img.wp-manga-chapter-img, .reading-content .page-break img")
             .mapNotNull(::imageAttribute)
             .distinct()
