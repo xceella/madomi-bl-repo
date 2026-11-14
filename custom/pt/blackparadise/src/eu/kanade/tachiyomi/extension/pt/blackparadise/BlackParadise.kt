@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
  * XBL Black Paradise: Madara theme with custom 2026 catalogue/search cards,
  * season-aware chapter listing, and direct image extraction.
  * Source was checked against public HTML on 2026-11-14.
+ * The XBL workflow applies the upstream formatter before assembling this module.
  */
 @Source
 abstract class BlackParadise : MadaraNoAjax() {
