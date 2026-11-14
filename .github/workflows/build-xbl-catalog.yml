@@ -19,6 +19,7 @@ on:
           - flowermanga
           - amuy
           - yaoifanclub
+          - blackparadise
   push:
     branches:
       - main

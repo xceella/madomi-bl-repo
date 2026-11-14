@@ -40,5 +40,11 @@
   {
     "slug": "yaoifanclub",
     "module": "src/pt/yaoifanclub"
+  },
+  {
+    "slug": "blackparadise",
+    "module": "src/pt/blackparadise",
+    "custom": "custom/pt/blackparadise",
+    "iconUrl": "https://raw.githubusercontent.com/xceella/madomi-bl-repo/main/custom/pt/blackparadise/res/mipmap-xhdpi/ic_launcher.png"
   }
 ]

@@ -25,6 +25,9 @@ No Mihon: **Mais → Configurações → Navegar → Repositórios de extensões
 | XXX Yaoi | Implementação própria XBL (adaptada de Keiyoushi) |
 | Nocturne Summer (Nocturne Fansub) | Base Keiyoushi |
 | FlowerManga.net (Flower Mangas) | Base Keiyoushi |
+| AMUY | Base Keiyoushi |
+| Yaoi Fan Club | Base Keiyoushi |
+| Black Paradise Yaoi | Extensão própria XBL (Madara, teste de compatibilidade) |
 
 Bodinho Yaoi foi removido do catálogo ativo por indisponibilidade/restrição de acesso. A extensão não será atualizada nem auditada como fonte ativa; os arquivos históricos do projeto permanecem arquivados. Remover do catálogo não desinstala uma APK já presente no celular.
 
@@ -42,7 +45,7 @@ Caso a mesma extensão já esteja instalada por outro repositório com assinatur
 
 ## Build e validação
 
-A seleção oficial está em [`catalog/sources.json`](catalog/sources.json) e o workflow em [`.github/workflows/build-xbl-catalog.yml`](.github/workflows/build-xbl-catalog.yml). Cada build baixa as extensões mantidas no Keiyoushi, compila as 7 escolhidas, assina e publica APKs/JARs em Releases e gera o catálogo `index.pb`, `index.json` e `repo.json` na raiz.
+A seleção oficial está em [`catalog/sources.json`](catalog/sources.json) e o workflow em [`.github/workflows/build-xbl-catalog.yml`](.github/workflows/build-xbl-catalog.yml). Cada build baixa as extensões mantidas no Keiyoushi, compila as fontes selecionadas, assina e publica APKs/JARs em Releases e gera o catálogo `index.pb`, `index.json` e `repo.json` na raiz.
 
 O workflow recusa módulos fora de `src/pt/` e metadados de fonte diferentes de `pt-BR`, para impedir a reintrodução acidental de fontes em inglês.
 
