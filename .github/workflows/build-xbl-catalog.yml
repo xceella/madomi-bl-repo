@@ -253,6 +253,11 @@ jobs:
 
           cd upstream
           chmod +x ./gradlew
+          # Spotless is required by Keiyoushi and may reformat custom XBL modules.
+          # Run the official formatter before the release task, without changing upstream sources.
+          if jq -e 'any(.[]; .slug == "blackparadise")' ../selected-sources.json > /dev/null; then
+            ./gradlew :src:pt:blackparadise:spotlessApply
+          fi
           ./gradlew "${TASKS[@]}"
 
       - name: Conferir versões e pacotes compilados antes da publicação
